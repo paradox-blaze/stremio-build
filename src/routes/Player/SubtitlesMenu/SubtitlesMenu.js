@@ -47,7 +47,7 @@ const SubtitlesMenu = React.memo(React.forwardRef((props, ref) => {
         const userLanguage = languages.toCode(props.subtitlesLanguage) ?? DEFAULT_SUBTITLES_LANGUAGE;
         const interfaceLanguage = languages.toCode(props.interfaceLanguage) ?? DEFAULT_SUBTITLES_LANGUAGE;
         const priorities = [LOCAL_SUBTITLES_LANGUAGE, userLanguage, interfaceLanguage];
-        const langs = Object.keys(Object.groupBy(allSubtitles, ({ lang }) => lang)).sort((a, b) => a.localeCompare(b));
+        const langs = [...new Set(allSubtitles.map(({ lang }) => lang))].sort((a, b) => a.localeCompare(b));
         return sortByValues(langs, priorities);
     }, [allSubtitles, props.subtitlesLanguage, props.interfaceLanguage]);
 
