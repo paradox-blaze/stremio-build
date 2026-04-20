@@ -735,7 +735,7 @@ const Player = ({ urlParams, queryParams }) => {
     onShortcut('statisticsMenu', () => {
         closeMenus();
         const stream = player.selected?.stream;
-        if (streamingServer?.statistics?.type !== 'Err' && typeof stream === 'string' && typeof stream === 'number') {
+        if (streamingServer?.statistics?.type !== 'Err' && typeof stream?.infoHash === 'string' && typeof stream?.fileIdx === 'number') {
             toggleStatisticsMenu();
         }
     }, [player.selected, streamingServer.statistics, toggleStatisticsMenu]);
