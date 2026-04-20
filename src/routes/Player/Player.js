@@ -474,16 +474,20 @@ const Player = ({ urlParams, queryParams }) => {
                         findTrackByLang(video.state.extraSubtitlesTracks, settings.subtitlesLanguage);
 
             if (subtitlesTrack && subtitlesTrack.id) {
-                video.setSubtitlesTrack(subtitlesTrack.id);
+                if (video.state.selectedSubtitlesTrackId !== subtitlesTrack.id) {
+                    video.setSubtitlesTrack(subtitlesTrack.id);
+                }
                 defaultSubtitlesSelected.current = true;
             } else if (extraSubtitlesTrack && extraSubtitlesTrack.id) {
-                video.setExtraSubtitlesTrack(extraSubtitlesTrack.id);
+                if (video.state.selectedExtraSubtitlesTrackId !== extraSubtitlesTrack.id) {
+                    video.setExtraSubtitlesTrack(extraSubtitlesTrack.id);
+                }
                 if (savedIsExternal) {
                     defaultSubtitlesSelected.current = true;
                 }
             }
         }
-    }, [video.state.subtitlesTracks, video.state.extraSubtitlesTracks, player.streamState]);
+    }, [video.state.subtitlesTracks, video.state.extraSubtitlesTracks, video.state.selectedSubtitlesTrackId, video.state.selectedExtraSubtitlesTrackId, player.streamState]);
 
     // Auto audio track selection
     React.useEffect(() => {
