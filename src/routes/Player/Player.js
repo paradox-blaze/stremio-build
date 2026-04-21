@@ -28,7 +28,6 @@ const useVideo = require('./useVideo');
 const styles = require('./styles');
 const Video = require('./Video');
 const { default: Indicator } = require('./Indicator/Indicator');
-const { default: HdrBadge } = require('./HdrBadge/HdrBadge');
 
 const findTrackByLang = (tracks, lang) => tracks.find((track) => track.lang === lang || langs.where('1', track.lang)?.[2] === lang);
 const findTrackById = (tracks, id) => tracks.find((track) => track.id === id);
@@ -961,6 +960,7 @@ const Player = ({ urlParams, queryParams }) => {
                 title={player.title !== null ? player.title : ''}
                 backButton={true}
                 fullscreenButton={true}
+                hdrInfo={video.state.hdrInfo}
                 onMouseMove={onBarMouseMove}
                 onMouseOver={onBarMouseMove}
             />
@@ -1010,10 +1010,6 @@ const Player = ({ urlParams, queryParams }) => {
                 className={classnames(styles['layer'], styles['indicator-layer'])}
                 videoState={video.state}
                 disabled={subtitlesMenuOpen}
-            />
-            <HdrBadge
-                className={classnames(styles['layer'], styles['hdr-badge-layer'])}
-                hdrInfo={video.state.hdrInfo}
             />
             {
                 nextVideoPopupOpen ?
