@@ -7,7 +7,13 @@ import styles from './Indicator.less';
 
 type Property = {
     label: string,
-    format: (value: number) => string,
+    format: (value: number | string) => string,
+};
+
+const VIDEO_SCALE_LABELS: Record<string, string> = {
+    'contain': 'Fit',
+    'cover': 'Crop',
+    'fill': 'Stretch',
 };
 
 const PROPERTIES: Record<string, Property> = {
@@ -15,9 +21,13 @@ const PROPERTIES: Record<string, Property> = {
         label: 'SUBTITLES_DELAY',
         format: (value) => `${(value / 1000).toFixed(2)}s`,
     },
+    'videoScale': {
+        label: 'VIDEO_SCALE',
+        format: (value) => VIDEO_SCALE_LABELS[String(value)] || String(value),
+    },
 };
 
-type VideoState = Record<string, number>;
+type VideoState = Record<string, number | string>;
 
 type Props = {
     className: string,

@@ -97,6 +97,9 @@ const Player = ({ urlParams, queryParams }) => {
 
     const isNavigating = React.useRef(false);
 
+    const VIDEO_SCALES = ['contain', 'cover', 'fill'];
+    const VIDEO_SCALE_LABELS = { contain: 'Fit', cover: 'Crop', fill: 'Stretch' };
+
     const playbackSpeed = React.useRef(video.state.playbackSpeed || 1);
     const pressTimer = React.useRef(null);
     const longPress = React.useRef(false);
@@ -234,6 +237,13 @@ const Player = ({ urlParams, queryParams }) => {
         playbackSpeed.current = rate;
 
     }, []);
+
+    const onVideoScaleChanged = React.useCallback(() => {
+        const currentScale = video.state.videoScale || 'contain';
+        const currentIndex = VIDEO_SCALES.indexOf(currentScale);
+        const nextScale = VIDEO_SCALES[(currentIndex + 1) % VIDEO_SCALES.length];
+        video.setVideoScale(nextScale);
+    }, [video.state.videoScale]);
 
     const onSubtitlesTrackSelected = React.useCallback((track) => {
         video.setSubtitlesTrack(track?.id ?? null);
@@ -999,6 +1009,9 @@ const Player = ({ urlParams, queryParams }) => {
                 onToggleSubtitlesMenu={toggleSubtitlesMenu}
                 onToggleAudioMenu={toggleAudioMenu}
                 onToggleSpeedMenu={toggleSpeedMenu}
+                videoScale={video.state.videoScale}
+                videoScaleLabel={VIDEO_SCALE_LABELS[video.state.videoScale || 'contain']}
+                onVideoScaleChanged={onVideoScaleChanged}
                 onToggleStatisticsMenu={toggleStatisticsMenu}
                 onToggleSideDrawer={toggleSideDrawer}
                 onMouseMove={onBarMouseMove}
