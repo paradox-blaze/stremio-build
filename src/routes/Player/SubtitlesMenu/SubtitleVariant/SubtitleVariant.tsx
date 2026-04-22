@@ -27,31 +27,18 @@ type Props = {
     onSelect: (track: SubtitlesTrack) => void,
 };
 
+const hasValidLabel = (label?: string) => label && label.length > 0 && !label.startsWith('http');
+
 const SubtitleVariant = ({ track, selected, onSelect }: Props) => {
     const { t } = useTranslation();
     const toast = useToast();
     const buttonRef = useRef<HTMLElement>(null);
     const triggers = useMemo(() => [buttonRef], []);
 
-    const downloadUrl = useMemo(() => {
-        return track.fallbackUrl || track.url;
-    }, [track.fallbackUrl, track.url]);
-
-    const variantLabel = useMemo(() => {
-        return (track.label && track.label.length > 0 && !track.label.startsWith('http'))
-            ? track.label
-            : languages.label(track.lang);
-    }, [track.label, track.lang]);
-
-    const downloadFileName = useMemo(() => {
-        return (track.label && track.label.length > 0 && !track.label.startsWith('http'))
-            ? track.label
-            : `subtitle-${track.lang || 'unknown'}`;
-    }, [track.label, track.lang]);
-
-    const canCopyUrl = useMemo(() => {
-        return typeof downloadUrl === 'string' && !downloadUrl.startsWith('blob:');
-    }, [downloadUrl]);
+    const downloadUrl = track.fallbackUrl || track.url;
+    const variantLabel = hasValidLabel(track.label) ? track.label : languages.label(track.lang);
+    const downloadFileName = hasValidLabel(track.label) ? track.label : `subtitle-${track.lang || 'unknown'}`;
+    const canCopyUrl = typeof downloadUrl === 'string' && !downloadUrl.startsWith('blob:');
 
     const onSelectClick = useCallback(() => {
         onSelect(track);

@@ -113,7 +113,7 @@ const SubtitlesMenu = React.memo(React.forwardRef((props, ref) => {
                 props.onExtraSubtitlesTrackSelected(track.id);
             }
         }
-    }, [subtitlesTracksForLanguage, props.onSubtitlesTrackSelected, props.onExtraSubtitlesTrackSelected]);
+    }, [props.onSubtitlesTrackSelected, props.onExtraSubtitlesTrackSelected]);
     const onSubtitlesDelayChanged = React.useCallback((value) => {
         if (typeof props.selectedExtraSubtitlesTrackId === 'string') {
             if (props.extraSubtitlesDelay !== null && !isNaN(props.extraSubtitlesDelay)) {
