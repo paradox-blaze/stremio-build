@@ -650,6 +650,7 @@ const Player = ({ urlParams, queryParams }) => {
                     video.state.paused ? onPlayRequested() : onPauseRequested();
                     break;
                 case 'next-track':
+                    video.setTime(0);
                     onNextVideoRequested();
                     break;
                 case 'previous-track':
