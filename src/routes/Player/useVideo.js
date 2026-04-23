@@ -22,6 +22,7 @@ const useVideo = () => {
         muted: null,
         playbackSpeed: null,
         videoParams: null,
+        hdrInfo: null,
         audioTracks: [],
         selectedAudioTrackId: null,
         subtitlesTracks: [],

@@ -28,6 +28,7 @@ const useVideo = require('./useVideo');
 const styles = require('./styles');
 const Video = require('./Video');
 const { default: Indicator } = require('./Indicator/Indicator');
+const { default: useMediaSession } = require('./useMediaSession');
 
 const findTrackByLang = (tracks, lang) => tracks.find((track) => track.lang === lang || langs.where('1', track.lang)?.[2] === lang);
 const findTrackById = (tracks, id) => tracks.find((track) => track.id === id);
@@ -606,52 +607,7 @@ const Player = ({ urlParams, queryParams }) => {
         }
     }, [settings.pauseOnMinimize, shell.windowClosed, shell.windowHidden]);
 
-    // Media Session PlaybackState
-    React.useEffect(() => {
-        if (!navigator.mediaSession) return;
-
-        const playbackState = !video.state.paused ? 'playing' : 'paused';
-        navigator.mediaSession.playbackState = playbackState;
-
-        return () => navigator.mediaSession.playbackState = 'none';
-    }, [video.state.paused]);
-
-    // Media Session Metadata
-    React.useEffect(() => {
-        if (!navigator.mediaSession) return;
-
-        const metaItem = player.metaItem && player.metaItem?.type === 'Ready' ? player.metaItem.content : null;
-        const videoId = player.selected ? player.selected?.streamRequest?.path?.id : null;
-        const video = metaItem ? metaItem.videos.find(({ id }) => id === videoId) : null;
-
-        const videoInfo = video && video.season && video.episode ? ` (${video.season}x${video.episode})` : null;
-        const videoTitle = video ? `${video.title}${videoInfo}` : null;
-        const metaTitle = metaItem ? metaItem.name : null;
-        const imageUrl = metaItem ? metaItem.logo : null;
-
-        const title = videoTitle ?? metaTitle;
-        const artist = videoTitle ? metaTitle : undefined;
-        const artwork = imageUrl ? [{ src: imageUrl }] : undefined;
-
-        if (title) {
-            navigator.mediaSession.metadata = new MediaMetadata({
-                title,
-                artist,
-                artwork,
-            });
-        }
-    }, [player.metaItem, player.selected]);
-
-    // Media Session Actions
-    React.useEffect(() => {
-        if (!navigator.mediaSession) return;
-
-        navigator.mediaSession.setActionHandler('play', onPlayRequested);
-        navigator.mediaSession.setActionHandler('pause', onPauseRequested);
-
-        const nexVideoCallback = player.nextVideo ? onNextVideoRequested : null;
-        navigator.mediaSession.setActionHandler('nexttrack', nexVideoCallback);
-    }, [player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested]);
+    useMediaSession(video.state, player, onPlayRequested, onPauseRequested, onNextVideoRequested);
 
     onShortcut('seekForward', (combo) => {
         if (video.state.time !== null) {
@@ -970,6 +926,7 @@ const Player = ({ urlParams, queryParams }) => {
                 title={player.title !== null ? player.title : ''}
                 backButton={true}
                 fullscreenButton={true}
+                hdrInfo={video.state.hdrInfo}
                 onMouseMove={onBarMouseMove}
                 onMouseOver={onBarMouseMove}
             />
