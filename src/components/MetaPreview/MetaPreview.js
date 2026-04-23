@@ -216,7 +216,8 @@ const MetaPreview = React.forwardRef(({ className, compact, name, logo, backgrou
                             label={t('TRAILER')}
                             tabIndex={compact ? -1 : 0}
                             href={trailerHref}
-                            tooltip={compact}
+                            tooltip={true}
+                            showLabel={true}
                         />
                         :
                         null
