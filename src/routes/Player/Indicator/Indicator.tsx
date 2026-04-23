@@ -10,10 +10,10 @@ type Property = {
     format: (value: number | string) => string,
 };
 
-const VIDEO_SCALE_LABELS: Record<string, string> = {
-    'contain': 'Fit',
-    'cover': 'Crop',
-    'fill': 'Stretch',
+const VIDEO_SCALE_KEYS: Record<string, string> = {
+    'contain': 'PLAYER_SCALE_FIT',
+    'cover': 'PLAYER_SCALE_CROP',
+    'fill': 'PLAYER_SCALE_STRETCH',
 };
 
 const PROPERTIES: Record<string, Property> = {
@@ -23,7 +23,7 @@ const PROPERTIES: Record<string, Property> = {
     },
     'videoScale': {
         label: 'VIDEO_SCALE',
-        format: (value) => VIDEO_SCALE_LABELS[String(value)] || String(value),
+        format: (value) => t(VIDEO_SCALE_KEYS[String(value)] || String(value)),
     },
 };
 
@@ -38,6 +38,7 @@ type Props = {
 const Indicator = ({ className, videoState, disabled }: Props) => {
     const timeout = useRef<NodeJS.Timeout | null>(null);
     const prevVideoState = useRef<VideoState>(videoState);
+    const initialized = useRef<Set<string>>(new Set());
 
     const [shown, show, hide] = useBinaryState(false);
     const [current, setCurrent] = useState<string | null>(null);
@@ -59,11 +60,15 @@ const Indicator = ({ className, videoState, disabled }: Props) => {
             const next = videoState[property];
 
             if (next && next !== prev) {
-                setCurrent(property);
-                show();
+                if (!initialized.current.has(property)) {
+                    initialized.current.add(property);
+                } else {
+                    setCurrent(property);
+                    show();
 
-                timeout.current && clearTimeout(timeout.current);
-                timeout.current = setTimeout(hide, 1000);
+                    timeout.current && clearTimeout(timeout.current);
+                    timeout.current = setTimeout(hide, 1000);
+                }
             }
         }
 

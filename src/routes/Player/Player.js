@@ -99,7 +99,7 @@ const Player = ({ urlParams, queryParams }) => {
     const isNavigating = React.useRef(false);
 
     const VIDEO_SCALES = ['contain', 'cover', 'fill'];
-    const VIDEO_SCALE_LABELS = { contain: 'Fit', cover: 'Crop', fill: 'Stretch' };
+    const VIDEO_SCALE_LABELS = { contain: t('PLAYER_SCALE_FIT'), cover: t('PLAYER_SCALE_CROP'), fill: t('PLAYER_SCALE_STRETCH') };
 
     const playbackSpeed = React.useRef(video.state.playbackSpeed || 1);
     const pressTimer = React.useRef(null);
