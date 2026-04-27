@@ -1,8 +1,9 @@
 // Copyright (C) 2017-2023 Smart code 203358507
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+// @ts-expect-error JS module without types
+import { useServices } from 'stremio/services';
 import useShell, { type WindowVisibility } from '../useShell';
-import useSettings from '../useSettings';
 import FullscreenContext, { type FullscreenContextValue } from './FullscreenContext';
 
 type Props = {
@@ -12,14 +13,23 @@ type Props = {
 // Single source of truth for fullscreen state. Mounted once at the app root so
 // the value survives route remounts (fixes desync where switching tabs while in
 // fullscreen would leave the UI thinking we were still windowed).
+//
+// We deliberately avoid useSettings()/useProfile() here because those go
+// through useModelState -> useCoreSuspender, which is only available beneath
+// the router's withCoreSuspender boundary. This provider sits above the
+// router (alongside ToastProvider et al.), so we read the single setting we
+// need (escExitFullscreen) directly from core.transport, which is provided
+// by ServicesProvider higher up the tree.
 const FullscreenProvider = ({ children }: Props) => {
     const shell = useShell();
-    const [settings] = useSettings();
+    const { core } = useServices();
 
     const [fullscreen, setFullscreen] = useState<boolean>(() => {
         if (typeof document === 'undefined') return false;
         return document.fullscreenElement === document.documentElement;
     });
+
+    const escExitFullscreenRef = useRef<boolean>(false);
 
     const requestFullscreen = useCallback(async () => {
         if (shell.active) {
@@ -48,6 +58,36 @@ const FullscreenProvider = ({ children }: Props) => {
     }, [fullscreen, exitFullscreen, requestFullscreen]);
 
     useEffect(() => {
+        if (!core?.active) return;
+
+        let cancelled = false;
+        const refreshSettings = async () => {
+            try {
+                const ctx = await core.transport.getState('ctx');
+                if (!cancelled) {
+                    escExitFullscreenRef.current = !!ctx?.profile?.settings?.escExitFullscreen;
+                }
+            } catch (err) {
+                console.error('FullscreenProvider: failed to read ctx state', err);
+            }
+        };
+
+        const onNewState = (models: string[]) => {
+            if (Array.isArray(models) && models.indexOf('ctx') !== -1) {
+                refreshSettings();
+            }
+        };
+
+        refreshSettings();
+        core.transport.on('NewState', onNewState);
+
+        return () => {
+            cancelled = true;
+            core.transport.off('NewState', onNewState);
+        };
+    }, [core]);
+
+    useEffect(() => {
         const onWindowVisibilityChanged = (state: WindowVisibility) => {
             setFullscreen(state.isFullscreen === true);
         };
@@ -66,7 +106,7 @@ const FullscreenProvider = ({ children }: Props) => {
                  activeElement.tagName === 'SELECT' ||
                  activeElement.isContentEditable);
 
-            if (event.code === 'Escape' && settings.escExitFullscreen) {
+            if (event.code === 'Escape' && escExitFullscreenRef.current) {
                 exitFullscreen();
             }
 
@@ -88,7 +128,7 @@ const FullscreenProvider = ({ children }: Props) => {
             document.removeEventListener('keydown', onKeyDown);
             document.removeEventListener('fullscreenchange', onFullscreenChange);
         };
-    }, [shell, settings.escExitFullscreen, toggleFullscreen, exitFullscreen]);
+    }, [shell, toggleFullscreen, exitFullscreen]);
 
     const value = useMemo<FullscreenContextValue>(
         () => [fullscreen, requestFullscreen, exitFullscreen, toggleFullscreen],
