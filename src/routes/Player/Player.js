@@ -669,7 +669,7 @@ const Player = ({ urlParams, queryParams }) => {
     }, [onIncreaseSubtitlesDelay, onDecreaseSubtitlesDelay], !menusOpen);
 
     onShortcut('subtitlesSize', (combo) => {
-        combo === 1 ? onUpdateSubtitlesSize(-1) : onUpdateSubtitlesSize(1);
+        combo === 1 ? onUpdateSubtitlesSize(1) : onUpdateSubtitlesSize(-1);
     }, [onUpdateSubtitlesSize, onUpdateSubtitlesSize], !menusOpen);
 
     onShortcut('toggleSubtitles', () => {
