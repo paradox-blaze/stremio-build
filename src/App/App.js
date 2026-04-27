@@ -7,6 +7,7 @@ const { Router } = require('stremio-router');
 const { Core, Shell, Chromecast, DragAndDrop, KeyboardShortcuts, ServicesProvider } = require('stremio/services');
 const { NotFound } = require('stremio/routes');
 const { FileDropProvider, PlatformProvider, ToastProvider, TooltipProvider, ShortcutsProvider, CONSTANTS, withCoreSuspender, useShell, useBinaryState } = require('stremio/common');
+const { FullscreenProvider } = require('stremio/common/Fullscreen');
 const ServicesToaster = require('./ServicesToaster');
 const DeepLinkHandler = require('./DeepLinkHandler');
 const SearchParamsHandler = require('./SearchParamsHandler');
@@ -214,18 +215,20 @@ const App = () => {
                                     <TooltipProvider className={styles['tooltip-container']}>
                                         <FileDropProvider className={styles['file-drop-container']}>
                                             <ShortcutsProvider onShortcut={onShortcut}>
-                                                {
-                                                    shortcutModalOpen && <ShortcutsModal onClose={closeShortcutsModal}/>
-                                                }
-                                                <ServicesToaster />
-                                                <DeepLinkHandler />
-                                                <SearchParamsHandler />
-                                                <UpdaterBanner className={styles['updater-banner-container']} />
-                                                <RouterWithProtectedRoutes
-                                                    className={styles['router']}
-                                                    viewsConfig={routerViewsConfig}
-                                                    onPathNotMatch={onPathNotMatch}
-                                                />
+                                                <FullscreenProvider>
+                                                    {
+                                                        shortcutModalOpen && <ShortcutsModal onClose={closeShortcutsModal}/>
+                                                    }
+                                                    <ServicesToaster />
+                                                    <DeepLinkHandler />
+                                                    <SearchParamsHandler />
+                                                    <UpdaterBanner className={styles['updater-banner-container']} />
+                                                    <RouterWithProtectedRoutes
+                                                        className={styles['router']}
+                                                        viewsConfig={routerViewsConfig}
+                                                        onPathNotMatch={onPathNotMatch}
+                                                    />
+                                                </FullscreenProvider>
                                             </ShortcutsProvider>
                                         </FileDropProvider>
                                     </TooltipProvider>
