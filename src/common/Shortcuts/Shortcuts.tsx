@@ -19,7 +19,7 @@ type Props = {
     onShortcut: (name: ShortcutName) => void,
 };
 
-const REPEAT_THROTTLE_MS = 200;
+const REPEAT_THROTTLE_MS = 130;
 
 const ShortcutsProvider = ({ children, onShortcut }: Props) => {
     const listeners = useRef<Map<ShortcutName, Set<ShortcutListener>>>(new Map());
