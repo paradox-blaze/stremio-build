@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useServices } from 'stremio/services';
+import onShortcut from '../Shortcuts/onShortcut';
 import useShell, { type WindowVisibility } from '../useShell';
 import FullscreenContext, { type FullscreenContextValue } from './FullscreenContext';
 
@@ -56,6 +57,8 @@ const FullscreenProvider = ({ children }: Props) => {
         fullscreen ? exitFullscreen() : requestFullscreen();
     }, [fullscreen, exitFullscreen, requestFullscreen]);
 
+    onShortcut('fullscreen', toggleFullscreen, [toggleFullscreen]);
+
     useEffect(() => {
         if (!core?.active) return;
 
@@ -102,21 +105,8 @@ const FullscreenProvider = ({ children }: Props) => {
         };
 
         const onKeyDown = (event: KeyboardEvent) => {
-            const activeElement = document.activeElement as HTMLElement;
-
-            const inputFocused =
-                activeElement &&
-                (activeElement.tagName === 'INPUT' ||
-                 activeElement.tagName === 'TEXTAREA' ||
-                 activeElement.tagName === 'SELECT' ||
-                 activeElement.isContentEditable);
-
             if (event.code === 'Escape' && escExitFullscreenRef.current) {
                 exitFullscreen();
-            }
-
-            if (event.code === 'KeyF' && !inputFocused) {
-                toggleFullscreen();
             }
 
             if (event.code === 'F11' && shell.active) {
