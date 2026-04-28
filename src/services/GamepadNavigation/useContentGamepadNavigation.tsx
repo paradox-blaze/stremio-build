@@ -1,6 +1,6 @@
 // Copyright (C) 2017-2026 Smart code 203358507
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useGamepad } from '../GamepadContext';
 
 const FOCUSABLE = '[tabindex="0"]';
@@ -20,12 +20,22 @@ const useContentGamepadNavigation = (
     gamepadHandlerId: string
 ) => {
     const gamepad = useGamepad();
+    const lastFocused = useRef<HTMLDivElement | null>(null);
+    const wasInOverlay = useRef(false);
 
     useEffect(() => {
         const handleGamepadNavigation = (
             direction: 'left' | 'right' | 'up' | 'down'
         ) => {
             const scope = getActiveScope(sectionRef.current);
+            const inOverlay = scope !== sectionRef.current;
+
+            if (inOverlay && !wasInOverlay.current) {
+                const focused = sectionRef.current?.querySelector<HTMLDivElement>(':focus');
+                if (focused) lastFocused.current = focused;
+            }
+            wasInOverlay.current = inOverlay;
+
             const elements = Array.from(
                 scope?.querySelectorAll<HTMLDivElement>(FOCUSABLE) || []
             );
@@ -39,57 +49,31 @@ const useContentGamepadNavigation = (
             }
 
             let closestElement: HTMLDivElement | null = null;
-            const currentRect = activeElement.getBoundingClientRect();
+            const cur = activeElement.getBoundingClientRect();
+            const cx = cur.left + cur.width / 2;
+            const cy = cur.top + cur.height / 2;
             let closestDistance = Infinity;
 
             elements.forEach((el) => {
                 if (el === activeElement) return;
-                const rect = el.getBoundingClientRect();
+                const r = el.getBoundingClientRect();
+                const ex = r.left + r.width / 2;
+                const ey = r.top + r.height / 2;
 
-                let distance = Infinity;
+                const isCorrectDirection =
+                    (direction === 'left' && ex < cx) ||
+                    (direction === 'right' && ex > cx) ||
+                    (direction === 'up' && ey < cy) ||
+                    (direction === 'down' && ey > cy);
 
-                switch (direction) {
-                    case 'left':
-                        if (
-                            rect.right <= currentRect.left &&
-                            (rect.top === currentRect.top ||
-                                (rect.top < currentRect.top && rect.bottom > currentRect.top)
-                            )
-                        ) {
-                            distance = currentRect.left - rect.right;
-                        }
-                        break;
-                    case 'right':
-                        if (
-                            currentRect.right <= rect.left &&
-                            (rect.top === currentRect.top ||
-                                (rect.top < currentRect.top && rect.bottom > currentRect.top)
-                            )
-                        ) {
-                            distance = rect.left - currentRect.right;
-                        }
-                        break;
-                    case 'up':
-                        if (
-                            rect.bottom <= currentRect.top &&
-                            (rect.left === currentRect.left ||
-                                (rect.left < currentRect.left && rect.right > currentRect.left)
-                            )
-                        ) {
-                            distance = currentRect.top - rect.bottom;
-                        }
-                        break;
-                    case 'down':
-                        if (
-                            rect.top >= currentRect.bottom &&
-                            (rect.left === currentRect.left ||
-                                (rect.left < currentRect.left && rect.right > currentRect.left)
-                            )
-                        ) {
-                            distance = rect.top - currentRect.bottom;
-                        }
-                        break;
-                }
+                if (!isCorrectDirection) return;
+
+                const dx = ex - cx;
+                const dy = ey - cy;
+                const isHorizontal = direction === 'left' || direction === 'right';
+                const primary = isHorizontal ? Math.abs(dx) : Math.abs(dy);
+                const secondary = isHorizontal ? Math.abs(dy) : Math.abs(dx);
+                const distance = primary + secondary * 3;
 
                 if (distance < closestDistance) {
                     closestDistance = distance;
@@ -104,10 +88,24 @@ const useContentGamepadNavigation = (
 
         const onSelect = () => {
             const scope = getActiveScope(sectionRef.current);
+            const inOverlay = scope !== sectionRef.current;
+
+            if (inOverlay && !wasInOverlay.current) {
+                const focused = sectionRef.current?.querySelector<HTMLDivElement>(':focus');
+                if (focused) lastFocused.current = focused;
+            }
+            wasInOverlay.current = inOverlay;
+
             const elements = Array.from(
                 scope?.querySelectorAll<HTMLDivElement>(FOCUSABLE) || []
             );
-            if (elements.length === 0) return;
+            if (elements.length === 0) {
+                if (lastFocused.current) {
+                    lastFocused.current.focus();
+                    wasInOverlay.current = false;
+                }
+                return;
+            }
 
             const activeElement = (scope ?? document)?.querySelector<HTMLDivElement>(':focus');
 
@@ -118,6 +116,14 @@ const useContentGamepadNavigation = (
             const isSelect = Array.from(activeElement.classList).some((cls) => cls.startsWith('select-input'));
             if (!isSelect) {
                 activeElement?.click();
+
+                requestAnimationFrame(() => {
+                    const stillInOverlay = getActiveScope(sectionRef.current) !== sectionRef.current;
+                    if (!stillInOverlay && wasInOverlay.current && lastFocused.current) {
+                        lastFocused.current.focus();
+                        wasInOverlay.current = false;
+                    }
+                });
             }
         };
 
