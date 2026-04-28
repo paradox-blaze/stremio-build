@@ -12,6 +12,7 @@ const DeepLinkHandler = require('./DeepLinkHandler');
 const SearchParamsHandler = require('./SearchParamsHandler');
 const { default: UpdaterBanner } = require('./UpdaterBanner');
 const { default: ShortcutsModal } = require('./ShortcutsModal');
+const { default: GamepadModal } = require('./GamepadModal');
 const ErrorDialog = require('./ErrorDialog');
 const withProtectedRoutes = require('./withProtectedRoutes');
 const routerViewsConfig = require('./routerViewsConfig');
@@ -41,12 +42,16 @@ const App = () => {
     }, []);
     const [initialized, setInitialized] = React.useState(false);
     const [shortcutModalOpen,, closeShortcutsModal, toggleShortcutModal] = useBinaryState(false);
+    const [gamepadModalOpen,, closeGamepadModal, toggleGamepadModal] = useBinaryState(false);
 
     const onShortcut = React.useCallback((name) => {
         if (name === 'shortcuts') {
             toggleShortcutModal();
         }
-    }, [toggleShortcutModal]);
+        if (name === 'gamepadGuide') {
+            toggleGamepadModal();
+        }
+    }, [toggleShortcutModal, toggleGamepadModal]);
 
     React.useEffect(() => {
         let prevPath = window.location.hash.slice(1);
@@ -222,10 +227,13 @@ const App = () => {
                                 <ToastProvider className={styles['toasts-container']}>
                                     <TooltipProvider className={styles['tooltip-container']}>
                                         <FileDropProvider className={styles['file-drop-container']}>
-                                            <GamepadProvider enabled={gamepadSupportEnabled}>
+                                            <GamepadProvider enabled={gamepadSupportEnabled} onGuide={toggleGamepadModal}>
                                                 <ShortcutsProvider onShortcut={onShortcut}>
                                                     {
                                                         shortcutModalOpen && <ShortcutsModal onClose={closeShortcutsModal}/>
+                                                    }
+                                                    {
+                                                        gamepadModalOpen && <GamepadModal onClose={closeGamepadModal}/>
                                                     }
                                                     <ServicesToaster />
                                                     <DeepLinkHandler />

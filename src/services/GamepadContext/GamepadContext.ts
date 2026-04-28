@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2025 Smart code 203358507
+// Copyright (C) 2017-2026 Smart code 203358507
 
 import { createContext } from 'react';
 

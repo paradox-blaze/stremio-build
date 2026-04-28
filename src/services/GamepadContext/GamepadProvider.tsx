@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2025 Smart code 203358507
+// Copyright (C) 2017-2026 Smart code 203358507
 
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,8 +9,9 @@ type GamepadEventHandlers = Map<string, Map<string, (data?: any) => void>>;
 
 const GamepadProvider: React.FC<{
     enabled: boolean;
+    onGuide?: () => void;
     children: React.ReactNode;
-}> = ({ enabled, children }) => {
+}> = ({ enabled, onGuide, children }) => {
     const { t } = useTranslation();
     const toast = useToast();
     const connectedGamepads = useRef<number>(0);
@@ -82,6 +83,15 @@ const GamepadProvider: React.FC<{
             }
         };
     }, [enabled]);
+
+    useEffect(() => {
+        if (onGuide) {
+            on('buttonX', 'gamepad-guide', onGuide);
+        }
+        return () => {
+            off('buttonX', 'gamepad-guide');
+        };
+    }, [onGuide]);
 
     useEffect(() => {
         if (!enabled || typeof navigator.getGamepads !== 'function') return;

@@ -1,55 +1,35 @@
-// Copyright (C) 2017-2025 Smart code 203358507
+// Copyright (C) 2017-2026 Smart code 203358507
 
 import { useEffect } from 'react';
 import { useGamepad } from '../GamepadContext';
 
-const useVerticalGamepadNavigation = (sectionRef: React.RefObject<HTMLDivElement>, gamepadHandlerId: string) => {
+const ROUTES = ['board', 'discover', 'library', 'calendar', 'addons', 'settings'];
+
+const useVerticalGamepadNavigation = (_sectionRef: React.RefObject<HTMLDivElement>, currentRoute: string) => {
     const gamepad = useGamepad();
 
     useEffect(() => {
-        const focusableSelector = 'a';
-        const focusableElements = () =>
-            Array.from(sectionRef.current?.querySelectorAll(focusableSelector) || []);
-
-        const moveFocus = (direction: 'prev' | 'next') => {
-            const route = window.location.hash.replace('#/', '') || 'board';
-            const elements = focusableElements();
-            if (!elements.length || route !== gamepadHandlerId) return;
-
-            const currentIndex = elements.findIndex((item) => item.classList.contains('selected'));
+        const navigate = (direction: 'prev' | 'next') => {
+            const currentIndex = ROUTES.indexOf(currentRoute);
+            if (currentIndex === -1) return;
 
             let nextIndex = currentIndex;
+            if (direction === 'next') nextIndex = Math.min(currentIndex + 1, ROUTES.length - 1);
+            if (direction === 'prev') nextIndex = Math.max(currentIndex - 1, 0);
 
-            if (direction === 'next')
-                nextIndex = (elements.length + currentIndex + 1) % elements.length;
-            if (direction === 'prev')
-                nextIndex = (elements.length + currentIndex - 1) % elements.length;
-
-            elements[nextIndex]?.click();
-        };
-
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (!(event as any).spatialNavigationPrevented) {
-                switch (event.key) {
-                    case 'Tab':
-                        moveFocus('next');
-                        break;
-                    default:
-                        break;
-                }
+            if (nextIndex !== currentIndex) {
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: String(nextIndex + 1), code: `Digit${nextIndex + 1}`, bubbles: true }));
             }
         };
 
-        document.addEventListener('keydown', handleKeyDown);
-        gamepad?.on('buttonLT', gamepadHandlerId, () => moveFocus('prev'));
-        gamepad?.on('buttonRT', gamepadHandlerId, () => moveFocus('next'));
+        gamepad?.on('buttonLT', currentRoute, () => navigate('prev'));
+        gamepad?.on('buttonRT', currentRoute, () => navigate('next'));
 
         return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-            gamepad?.off('buttonLT', gamepadHandlerId);
-            gamepad?.off('buttonRT', gamepadHandlerId);
+            gamepad?.off('buttonLT', currentRoute);
+            gamepad?.off('buttonRT', currentRoute);
         };
-    }, [gamepad, sectionRef]);
+    }, [gamepad, currentRoute]);
 };
 
 export default useVerticalGamepadNavigation;
