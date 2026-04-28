@@ -60,33 +60,35 @@ const FullscreenProvider = ({ children }: Props) => {
         if (!core?.active) return;
 
         let cancelled = false;
-        const refreshSettings = async () => {
-            try {
-                const ctx = await core.transport.getState('ctx') as Ctx | null;
-                if (!cancelled) {
-                    escExitFullscreenRef.current = !!ctx?.profile?.settings?.escExitFullscreen;
-                }
-            } catch (err) {
+
+        // CoreTransport.on types the listener as () => void, but 'CoreEvent'
+        // actually emits { event, args }. Read it via a rest-args wrapper to
+        // stay compatible with the ambient signature.
+        const onCoreEvent = (...listenerArgs: unknown[]) => {
+            const payload = listenerArgs[0] as
+                | { event?: string, args?: { settings?: { escExitFullscreen?: boolean } } }
+                | undefined;
+            if (payload?.event === 'SettingsUpdated' &&
+                typeof payload.args?.settings?.escExitFullscreen === 'boolean') {
+                escExitFullscreenRef.current = payload.args.settings.escExitFullscreen;
+            }
+        };
+
+        core.transport.getState('ctx')
+            .then((ctx) => {
+                if (cancelled) return;
+                const settings = (ctx as Ctx | null)?.profile?.settings;
+                escExitFullscreenRef.current = !!settings?.escExitFullscreen;
+            })
+            .catch((err) => {
                 console.error('FullscreenProvider: failed to read ctx state', err);
-            }
-        };
+            });
 
-        // CoreTransport.on types the listener as () => void, but the 'NewState'
-        // event actually emits a string[] of changed model names. Read it via
-        // a rest-args wrapper to stay compatible with the ambient signature.
-        const onNewState = (...args: unknown[]) => {
-            const models = args[0];
-            if (Array.isArray(models) && models.indexOf('ctx') !== -1) {
-                refreshSettings();
-            }
-        };
-
-        refreshSettings();
-        core.transport.on('NewState', onNewState);
+        core.transport.on('CoreEvent', onCoreEvent);
 
         return () => {
             cancelled = true;
-            core.transport.off('NewState', onNewState);
+            core.transport.off('CoreEvent', onCoreEvent);
         };
     }, [core]);
 
