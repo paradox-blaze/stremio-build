@@ -1,7 +1,6 @@
 // Copyright (C) 2017-2023 Smart code 203358507
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-// @ts-expect-error JS module without types
 import { useServices } from 'stremio/services';
 import useShell, { type WindowVisibility } from '../useShell';
 import FullscreenContext, { type FullscreenContextValue } from './FullscreenContext';
@@ -63,7 +62,7 @@ const FullscreenProvider = ({ children }: Props) => {
         let cancelled = false;
         const refreshSettings = async () => {
             try {
-                const ctx = await core.transport.getState('ctx');
+                const ctx = await core.transport.getState('ctx') as Ctx | null;
                 if (!cancelled) {
                     escExitFullscreenRef.current = !!ctx?.profile?.settings?.escExitFullscreen;
                 }
@@ -72,7 +71,11 @@ const FullscreenProvider = ({ children }: Props) => {
             }
         };
 
-        const onNewState = (models: string[]) => {
+        // CoreTransport.on types the listener as () => void, but the 'NewState'
+        // event actually emits a string[] of changed model names. Read it via
+        // a rest-args wrapper to stay compatible with the ambient signature.
+        const onNewState = (...args: unknown[]) => {
+            const models = args[0];
             if (Array.isArray(models) && models.indexOf('ctx') !== -1) {
                 refreshSettings();
             }
