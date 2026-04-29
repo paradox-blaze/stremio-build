@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2023 Smart code 203358507
+// Copyright (C) 2017-2026 Smart code 203358507
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useServices } from 'stremio/services';
@@ -10,16 +10,6 @@ type Props = {
     children: React.ReactNode,
 };
 
-// Single source of truth for fullscreen state. Mounted once at the app root so
-// the value survives route remounts (fixes desync where switching tabs while in
-// fullscreen would leave the UI thinking we were still windowed).
-//
-// We deliberately avoid useSettings()/useProfile() here because those go
-// through useModelState -> useCoreSuspender, which is only available beneath
-// the router's withCoreSuspender boundary. This provider sits above the
-// router (alongside ToastProvider et al.), so we read the single setting we
-// need (escExitFullscreen) directly from core.transport, which is provided
-// by ServicesProvider higher up the tree.
 const FullscreenProvider = ({ children }: Props) => {
     const shell = useShell();
     const { core } = useServices();
@@ -64,9 +54,6 @@ const FullscreenProvider = ({ children }: Props) => {
 
         let cancelled = false;
 
-        // CoreTransport.on types the listener as () => void, but 'CoreEvent'
-        // actually emits { event, args }. Read it via a rest-args wrapper to
-        // stay compatible with the ambient signature.
         const onCoreEvent = (...listenerArgs: unknown[]) => {
             const payload = listenerArgs[0] as
                 | { event?: string, args?: { settings?: { escExitFullscreen?: boolean } } }

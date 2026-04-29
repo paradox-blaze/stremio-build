@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2023 Smart code 203358507
+// Copyright (C) 2017-2026 Smart code 203358507
 
 import { createContext } from 'react';
 
@@ -9,7 +9,7 @@ export type FullscreenContextValue = readonly [
     () => void,
 ];
 
-const noop = () => { /* no-op */ };
+const noop = () => undefined;
 
 const defaultValue: FullscreenContextValue = [false, noop, noop, noop];
 
