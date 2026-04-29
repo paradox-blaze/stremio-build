@@ -7,11 +7,13 @@ import GamepadContext from './GamepadContext';
 
 type GamepadEventHandlers = Map<string, Map<string, (data?: any) => void>>;
 
-const GamepadProvider: React.FC<{
+type GamepadProviderProps = {
     enabled: boolean;
     onGuide?: () => void;
     children: React.ReactNode;
-}> = ({ enabled, onGuide, children }) => {
+};
+
+const GamepadProvider = ({ enabled, onGuide, children }: GamepadProviderProps) => {
     const { t } = useTranslation();
     const toast = useToast();
     const connectedGamepads = useRef<number>(0);
