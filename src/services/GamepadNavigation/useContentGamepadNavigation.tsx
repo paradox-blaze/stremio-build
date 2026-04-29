@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useGamepad } from '../GamepadContext';
 
-const FOCUSABLE = '[tabindex="0"]';
+const FOCUSABLE = '[tabindex]';
 
 const getActiveScope = (fallback: HTMLDivElement | null): HTMLElement | null => {
     const modal = document.querySelector<HTMLElement>('.modals-container');
