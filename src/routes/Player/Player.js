@@ -571,12 +571,14 @@ const Player = ({ urlParams, queryParams }) => {
                         findTrackByLang(video.state.extraSubtitlesTracks, settings.subtitlesLanguage);
 
             if (subtitlesTrack && subtitlesTrack.id) {
-                if (video.state.selectedSubtitlesTrackId !== subtitlesTrack.id) {
+                if (video.state.selectedSubtitlesTrackId !== subtitlesTrack.id ||
+                    video.state.selectedExtraSubtitlesTrackId !== null) {
                     video.setSubtitlesTrack(subtitlesTrack.id);
                 }
                 defaultSubtitlesSelected.current = true;
             } else if (extraSubtitlesTrack && extraSubtitlesTrack.id) {
-                if (video.state.selectedExtraSubtitlesTrackId !== extraSubtitlesTrack.id) {
+                if (video.state.selectedExtraSubtitlesTrackId !== extraSubtitlesTrack.id ||
+                    video.state.selectedSubtitlesTrackId !== null) {
                     video.setExtraSubtitlesTrack(extraSubtitlesTrack.id);
                 }
                 if (savedIsExternal) {
