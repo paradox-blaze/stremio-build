@@ -1,8 +1,9 @@
 // Copyright (C) 2017-2026 Smart code 203358507
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useServices } from 'stremio/services';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { withCoreSuspender } from '../CoreSuspender';
 import onShortcut from '../Shortcuts/onShortcut';
+import useSettings from '../useSettings';
 import useShell, { type WindowVisibility } from '../useShell';
 import FullscreenContext, { type FullscreenContextValue } from './FullscreenContext';
 
@@ -22,14 +23,13 @@ const isTextInputFocused = () => {
 
 const FullscreenProvider = ({ children }: Props) => {
     const shell = useShell();
-    const { core } = useServices();
+    const [settings] = useSettings();
+    const escExitFullscreen = settings.escExitFullscreen;
 
     const [fullscreen, setFullscreen] = useState<boolean>(() => {
         if (typeof document === 'undefined') return false;
         return document.fullscreenElement === document.documentElement;
     });
-
-    const escExitFullscreenRef = useRef<boolean>(false);
 
     const requestFullscreen = useCallback(async () => {
         if (shell.active) {
@@ -65,39 +65,6 @@ const FullscreenProvider = ({ children }: Props) => {
     onShortcut('fullscreen', toggleFullscreenFromShortcut, [toggleFullscreenFromShortcut]);
 
     useEffect(() => {
-        if (!core?.active) return;
-
-        let cancelled = false;
-
-        const onCoreEvent = (...listenerArgs: unknown[]) => {
-            const payload = listenerArgs[0] as
-                | { event?: string, args?: { settings?: { escExitFullscreen?: boolean } } }
-                | undefined;
-            if (payload?.event === 'SettingsUpdated' &&
-                typeof payload.args?.settings?.escExitFullscreen === 'boolean') {
-                escExitFullscreenRef.current = payload.args.settings.escExitFullscreen;
-            }
-        };
-
-        core.transport.getState('ctx')
-            .then((ctx) => {
-                if (cancelled) return;
-                const settings = (ctx as Ctx | null)?.profile?.settings;
-                escExitFullscreenRef.current = !!settings?.escExitFullscreen;
-            })
-            .catch((err) => {
-                console.error('FullscreenProvider: failed to read ctx state', err);
-            });
-
-        core.transport.on('CoreEvent', onCoreEvent);
-
-        return () => {
-            cancelled = true;
-            core.transport.off('CoreEvent', onCoreEvent);
-        };
-    }, [core]);
-
-    useEffect(() => {
         const onWindowVisibilityChanged = (state: WindowVisibility) => {
             setFullscreen(state.isFullscreen === true);
         };
@@ -107,7 +74,7 @@ const FullscreenProvider = ({ children }: Props) => {
         };
 
         const onKeyDown = (event: KeyboardEvent) => {
-            if (event.code === 'Escape' && escExitFullscreenRef.current) {
+            if (event.code === 'Escape' && escExitFullscreen) {
                 exitFullscreen();
             }
 
@@ -125,7 +92,7 @@ const FullscreenProvider = ({ children }: Props) => {
             document.removeEventListener('keydown', onKeyDown);
             document.removeEventListener('fullscreenchange', onFullscreenChange);
         };
-    }, [shell, toggleFullscreen, exitFullscreen]);
+    }, [shell, toggleFullscreen, exitFullscreen, escExitFullscreen]);
 
     const value = useMemo<FullscreenContextValue>(
         () => [fullscreen, requestFullscreen, exitFullscreen, toggleFullscreen],
@@ -139,4 +106,4 @@ const FullscreenProvider = ({ children }: Props) => {
     );
 };
 
-export default FullscreenProvider;
+export default withCoreSuspender(FullscreenProvider);
