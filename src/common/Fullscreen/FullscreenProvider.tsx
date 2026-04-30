@@ -10,6 +10,16 @@ type Props = {
     children: React.ReactNode,
 };
 
+const isTextInputFocused = () => {
+    const activeElement = document.activeElement;
+
+    return activeElement instanceof HTMLElement &&
+        (activeElement.tagName === 'INPUT' ||
+            activeElement.tagName === 'TEXTAREA' ||
+            activeElement.tagName === 'SELECT' ||
+            activeElement.isContentEditable);
+};
+
 const FullscreenProvider = ({ children }: Props) => {
     const shell = useShell();
     const { core } = useServices();
@@ -47,7 +57,12 @@ const FullscreenProvider = ({ children }: Props) => {
         fullscreen ? exitFullscreen() : requestFullscreen();
     }, [fullscreen, exitFullscreen, requestFullscreen]);
 
-    onShortcut('fullscreen', toggleFullscreen, [toggleFullscreen]);
+    const toggleFullscreenFromShortcut = useCallback(() => {
+        if (isTextInputFocused()) return;
+        toggleFullscreen();
+    }, [toggleFullscreen]);
+
+    onShortcut('fullscreen', toggleFullscreenFromShortcut, [toggleFullscreenFromShortcut]);
 
     useEffect(() => {
         if (!core?.active) return;
