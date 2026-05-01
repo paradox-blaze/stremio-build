@@ -127,7 +127,7 @@ const Player = ({ urlParams, queryParams }) => {
     const longPress = React.useRef(false);
     const controlBarRef = React.useRef(null);
 
-    const HOLD_DELAY = 200;
+    const HOLD_DELAY = 400;
 
     const handleNextVideoNavigation = React.useCallback((deepLinks, bingeWatching, ended) => {
         if (ended) {
