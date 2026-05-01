@@ -3,17 +3,13 @@
 import { createContext } from 'react';
 
 export type FullscreenContextValue = readonly [
-    boolean,
-    () => Promise<void> | void,
-    () => void,
-    () => void,
+    fullscreen: boolean,
+    requestFullscreen: () => Promise<void> | void,
+    exitFullscreen: () => void,
+    toggleFullscreen: () => void,
 ];
 
-const noop = () => undefined;
-
-const defaultValue: FullscreenContextValue = [false, noop, noop, noop];
-
-const FullscreenContext = createContext<FullscreenContextValue>(defaultValue);
+const FullscreenContext = createContext<FullscreenContextValue | null>(null);
 
 FullscreenContext.displayName = 'FullscreenContext';
 

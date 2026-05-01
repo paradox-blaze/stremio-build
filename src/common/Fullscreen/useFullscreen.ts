@@ -3,6 +3,13 @@
 import { useContext } from 'react';
 import FullscreenContext from './FullscreenContext';
 
-const useFullscreen = () => useContext(FullscreenContext);
+const useFullscreen = () => {
+    const value = useContext(FullscreenContext);
+    if (value === null) {
+        throw new Error('useFullscreen must be used inside FullscreenProvider');
+    }
+
+    return value;
+};
 
 export default useFullscreen;
