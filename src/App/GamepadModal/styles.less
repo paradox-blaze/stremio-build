@@ -34,7 +34,7 @@
         border-radius: var(--border-radius);
         background-color: var(--modal-background-color);
         box-shadow: var(--outer-glow);
-        overflow-y: auto;
+        overflow: hidden;
 
         .header {
             flex: none;
@@ -89,6 +89,8 @@
             gap: 3rem;
             padding: 0 3rem;
             padding-bottom: 3rem;
+            flex: 1;
+            min-height: 0;
             overflow-y: auto;
         }
     }
