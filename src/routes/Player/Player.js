@@ -255,6 +255,12 @@ const Player = ({ urlParams, queryParams }) => {
         }
     }, [player.nextVideo, handleNextVideoNavigation, profile.settings]);
 
+    const onPreviousTrackRequested = React.useCallback(() => {
+        if (video.state.time !== null && video.state.time > 5000) {
+            onSeekRequested(0);
+        }
+    }, [video.state.time, onSeekRequested]);
+
     const onVideoClick = React.useCallback(() => {
         if (video.state.paused !== null && !longPress.current) {
             if (video.state.paused) {
@@ -534,13 +540,21 @@ const Player = ({ urlParams, queryParams }) => {
         }
     }, [settings.pauseOnMinimize, shell.windowClosed, shell.windowHidden]);
 
-    useMediaSession(video.state, player, onPlayRequested, onPauseRequested, onNextVideoRequested);
+    useMediaSession(video.state, player, onPlayRequested, onPauseRequested, onNextVideoRequested, onPreviousTrackRequested);
 
     React.useEffect(() => {
         const onMediaKey = (action) => {
             switch (action) {
                 case 'play-pause':
-                    video.state.paused ? onPlayRequested() : onPauseRequested();
+                    if (video.state.paused !== null) {
+                        video.state.paused ? onPlayRequested() : onPauseRequested();
+                    }
+                    break;
+                case 'play':
+                    onPlayRequested();
+                    break;
+                case 'pause':
+                    onPauseRequested();
                     break;
                 case 'next-track':
                     if (player.nextVideo !== null) {
@@ -549,15 +563,13 @@ const Player = ({ urlParams, queryParams }) => {
                     }
                     break;
                 case 'previous-track':
-                    if (video.state.time !== null && video.state.time > 5000) {
-                        onSeekRequested(0);
-                    }
+                    onPreviousTrackRequested();
                     break;
             }
         };
         shell.on('media-key', onMediaKey);
         return () => shell.off('media-key', onMediaKey);
-    }, [video.state.paused, video.state.time, player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested, onSeekRequested]);
+    }, [video.state.paused, player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested, onPreviousTrackRequested]);
 
     onShortcut('seekForward', (combo) => {
         if (video.state.time !== null) {
