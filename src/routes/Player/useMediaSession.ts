@@ -6,11 +6,12 @@ const useMediaSession = (
     onPlayRequested: () => void,
     onPauseRequested: () => void,
     onNextVideoRequested: () => void,
+    onPreviousTrackRequested: () => void,
 ) => {
     useEffect(() => {
         if (!navigator.mediaSession) return;
 
-        const playbackState = !videoState.paused ? 'playing' : 'paused';
+        const playbackState = videoState.paused === null ? 'none' : videoState.paused ? 'paused' : 'playing';
         navigator.mediaSession.playbackState = playbackState;
 
         return () => {
@@ -49,9 +50,17 @@ const useMediaSession = (
         navigator.mediaSession.setActionHandler('play', onPlayRequested);
         navigator.mediaSession.setActionHandler('pause', onPauseRequested);
 
-        const nexVideoCallback = player.nextVideo ? onNextVideoRequested : null;
-        navigator.mediaSession.setActionHandler('nexttrack', nexVideoCallback);
-    }, [player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested]);
+        const nextVideoCallback = player.nextVideo ? onNextVideoRequested : null;
+        navigator.mediaSession.setActionHandler('nexttrack', nextVideoCallback);
+        navigator.mediaSession.setActionHandler('previoustrack', onPreviousTrackRequested);
+
+        return () => {
+            navigator.mediaSession.setActionHandler('play', null);
+            navigator.mediaSession.setActionHandler('pause', null);
+            navigator.mediaSession.setActionHandler('nexttrack', null);
+            navigator.mediaSession.setActionHandler('previoustrack', null);
+        };
+    }, [player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested, onPreviousTrackRequested]);
 };
 
 export default useMediaSession;
