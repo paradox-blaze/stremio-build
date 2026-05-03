@@ -21,7 +21,7 @@
             {
                 "name": "exit",
                 "label": "SETTINGS_SHORTCUT_EXIT_BACK",
-                "combos": [["Escape"]]
+                "combos": [["Backspace"]]
             },
             {
                 "name": "shortcuts",
