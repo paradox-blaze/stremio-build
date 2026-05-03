@@ -6,7 +6,6 @@ const useMediaSession = (
     onPlayRequested: () => void,
     onPauseRequested: () => void,
     onNextVideoRequested: () => void,
-    onPreviousTrackRequested: () => void,
 ) => {
     useEffect(() => {
         if (!navigator.mediaSession) return;
@@ -52,15 +51,13 @@ const useMediaSession = (
 
         const nextVideoCallback = player.nextVideo ? onNextVideoRequested : null;
         navigator.mediaSession.setActionHandler('nexttrack', nextVideoCallback);
-        navigator.mediaSession.setActionHandler('previoustrack', onPreviousTrackRequested);
 
         return () => {
             navigator.mediaSession.setActionHandler('play', null);
             navigator.mediaSession.setActionHandler('pause', null);
             navigator.mediaSession.setActionHandler('nexttrack', null);
-            navigator.mediaSession.setActionHandler('previoustrack', null);
         };
-    }, [player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested, onPreviousTrackRequested]);
+    }, [player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested]);
 };
 
 export default useMediaSession;
