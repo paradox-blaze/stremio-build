@@ -255,12 +255,6 @@ const Player = ({ urlParams, queryParams }) => {
         }
     }, [player.nextVideo, handleNextVideoNavigation, profile.settings]);
 
-    const onPreviousTrackRequested = React.useCallback(() => {
-        if (video.state.time !== null && video.state.time > 5000) {
-            onSeekRequested(0);
-        }
-    }, [video.state.time, onSeekRequested]);
-
     const onVideoClick = React.useCallback(() => {
         if (video.state.paused !== null && !longPress.current) {
             if (video.state.paused) {
@@ -540,7 +534,7 @@ const Player = ({ urlParams, queryParams }) => {
         }
     }, [settings.pauseOnMinimize, shell.windowClosed, shell.windowHidden]);
 
-    useMediaSession(video.state, player, onPlayRequested, onPauseRequested, onNextVideoRequested, onPreviousTrackRequested);
+    useMediaSession(video.state, player, onPlayRequested, onPauseRequested, onNextVideoRequested);
 
     React.useEffect(() => {
         const onMediaKey = (action) => {
@@ -562,14 +556,11 @@ const Player = ({ urlParams, queryParams }) => {
                         onNextVideoRequested();
                     }
                     break;
-                case 'previous-track':
-                    onPreviousTrackRequested();
-                    break;
             }
         };
         shell.on('media-key', onMediaKey);
         return () => shell.off('media-key', onMediaKey);
-    }, [video.state.paused, player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested, onPreviousTrackRequested]);
+    }, [video.state.paused, player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested]);
 
     onShortcut('seekForward', (combo) => {
         if (video.state.time !== null) {
