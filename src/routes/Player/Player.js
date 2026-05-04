@@ -786,181 +786,181 @@ const Player = ({ urlParams, queryParams }) => {
             onMouseMove={onContainerMouseMove}
             onMouseOver={onContainerMouseMove}
             onMouseLeave={onContainerMouseLeave}>
-                <Video
-                    ref={video.containerRef}
-                    className={styles['layer']}
-                    onClick={onVideoClick}
-                    onDoubleClick={onVideoDoubleClick}
-                />
-                {
-                    !video.state.loaded ?
-                        <div className={classnames(styles['layer'], styles['background-layer'])}>
-                            <img className={styles['image']} src={player?.metaItem?.content?.background} />
-                        </div>
-                        :
-                        null
-                }
-                {
-                    (video.state.buffering || !video.state.loaded) && !error ?
-                        <BufferingLoader
-                            ref={bufferingRef}
-                            className={classnames(styles['layer'], styles['buffering-layer'])}
-                            logo={player?.metaItem?.content?.logo}
-                        />
-                        :
-                        null
-                }
-                {
-                    error !== null ?
-                        <Error
-                            ref={errorRef}
-                            className={classnames(styles['layer'], styles['error-layer'])}
-                            stream={video.state.stream}
-                            {...error}
-                        />
-                        :
-                        null
-                }
-                {
-                    menusOpen ?
-                        <div className={styles['layer']} />
-                        :
-                        null
-                }
-                {
-                    video.state.volume !== null && overlayHidden ?
-                        <VolumeChangeIndicator
-                            muted={video.state.muted}
-                            volume={video.state.volume}
-                        />
-                        :
-                        null
-                }
-                <ContextMenu on={[video.containerRef, bufferingRef, errorRef]} autoClose>
-                    <OptionsMenu
-                        className={classnames(styles['layer'], styles['menu-layer'])}
-                        stream={player?.selected?.stream}
-                        playbackDevices={playbackDevices}
-                        extraSubtitlesTracks={extraSubtitleTracks}
-                        selectedExtraSubtitlesTrackId={selectedExtraSubtitleTrackId}
+            <Video
+                ref={video.containerRef}
+                className={styles['layer']}
+                onClick={onVideoClick}
+                onDoubleClick={onVideoDoubleClick}
+            />
+            {
+                !video.state.loaded ?
+                    <div className={classnames(styles['layer'], styles['background-layer'])}>
+                        <img className={styles['image']} src={player?.metaItem?.content?.background} />
+                    </div>
+                    :
+                    null
+            }
+            {
+                (video.state.buffering || !video.state.loaded) && !error ?
+                    <BufferingLoader
+                        ref={bufferingRef}
+                        className={classnames(styles['layer'], styles['buffering-layer'])}
+                        logo={player?.metaItem?.content?.logo}
                     />
-                </ContextMenu>
-                <HorizontalNavBar
-                    className={classnames(styles['layer'], styles['nav-bar-layer'])}
-                    title={player.title !== null ? player.title : ''}
-                    backButton={true}
-                    fullscreenButton={true}
-                    hdrInfo={video.state.hdrInfo}
-                    onMouseMove={onBarMouseMove}
-                    onMouseOver={onBarMouseMove}
+                    :
+                    null
+            }
+            {
+                error !== null ?
+                    <Error
+                        ref={errorRef}
+                        className={classnames(styles['layer'], styles['error-layer'])}
+                        stream={video.state.stream}
+                        {...error}
+                    />
+                    :
+                    null
+            }
+            {
+                menusOpen ?
+                    <div className={styles['layer']} />
+                    :
+                    null
+            }
+            {
+                video.state.volume !== null && overlayHidden ?
+                    <VolumeChangeIndicator
+                        muted={video.state.muted}
+                        volume={video.state.volume}
+                    />
+                    :
+                    null
+            }
+            <ContextMenu on={[video.containerRef, bufferingRef, errorRef]} autoClose>
+                <OptionsMenu
+                    className={classnames(styles['layer'], styles['menu-layer'])}
+                    stream={player?.selected?.stream}
+                    playbackDevices={playbackDevices}
+                    extraSubtitlesTracks={extraSubtitleTracks}
+                    selectedExtraSubtitlesTrackId={selectedExtraSubtitleTrackId}
                 />
-                {
-                    player.metaItem?.type === 'Ready' ?
-                        <SideDrawerButton
-                            className={classnames(styles['layer'], styles['side-drawer-button-layer'])}
-                            onClick={toggleSideDrawer}
-                        />
-                        :
-                        null
-                }
-                <ControlBar
-                    ref={controlBarRef}
-                    className={classnames(styles['layer'], styles['control-bar-layer'])}
-                    paused={video.state.paused}
-                    time={video.state.time}
-                    duration={video.state.duration}
-                    buffered={video.state.buffered}
-                    volume={video.state.volume}
-                    muted={video.state.muted}
-                    playbackSpeed={video.state.playbackSpeed}
-                    subtitlesTracks={allSubtitleTracks}
+            </ContextMenu>
+            <HorizontalNavBar
+                className={classnames(styles['layer'], styles['nav-bar-layer'])}
+                title={player.title !== null ? player.title : ''}
+                backButton={true}
+                fullscreenButton={true}
+                hdrInfo={video.state.hdrInfo}
+                onMouseMove={onBarMouseMove}
+                onMouseOver={onBarMouseMove}
+            />
+            {
+                player.metaItem?.type === 'Ready' ?
+                    <SideDrawerButton
+                        className={classnames(styles['layer'], styles['side-drawer-button-layer'])}
+                        onClick={toggleSideDrawer}
+                    />
+                    :
+                    null
+            }
+            <ControlBar
+                ref={controlBarRef}
+                className={classnames(styles['layer'], styles['control-bar-layer'])}
+                paused={video.state.paused}
+                time={video.state.time}
+                duration={video.state.duration}
+                buffered={video.state.buffered}
+                volume={video.state.volume}
+                muted={video.state.muted}
+                playbackSpeed={video.state.playbackSpeed}
+                subtitlesTracks={allSubtitleTracks}
+                audioTracks={video.state.audioTracks}
+                metaItem={player.metaItem}
+                nextVideo={player.nextVideo}
+                stream={player.selected !== null ? player.selected.stream : null}
+                statistics={statistics}
+                onPlayRequested={onPlayRequested}
+                onPauseRequested={onPauseRequested}
+                onNextVideoRequested={onNextVideoRequested}
+                onMuteRequested={onMuteRequested}
+                onUnmuteRequested={onUnmuteRequested}
+                onVolumeChangeRequested={onVolumeChangeRequested}
+                onSeekRequested={onSeekRequested}
+                onToggleOptionsMenu={toggleOptionsMenu}
+                onToggleSubtitlesMenu={toggleSubtitlesMenu}
+                onToggleAudioMenu={toggleAudioMenu}
+                onToggleSpeedMenu={toggleSpeedMenu}
+                videoScale={video.state.videoScale}
+                videoScaleLabel={VIDEO_SCALE_LABELS[video.state.videoScale || 'contain']}
+                onVideoScaleChanged={onVideoScaleChanged}
+                onToggleStatisticsMenu={toggleStatisticsMenu}
+                onToggleSideDrawer={toggleSideDrawer}
+                onMouseMove={onBarMouseMove}
+                onMouseOver={onBarMouseMove}
+                onTouchEnd={onContainerMouseLeave}
+            />
+            <Indicator
+                className={classnames(styles['layer'], styles['indicator-layer'])}
+                videoState={video.state}
+                disabled={subtitlesMenuOpen}
+            />
+            {
+                nextVideoPopupOpen ?
+                    <NextVideoPopup
+                        className={classnames(styles['layer'], styles['menu-layer'])}
+                        metaItem={player.metaItem !== null && player.metaItem.type === 'Ready' ? player.metaItem.content : null}
+                        nextVideo={player.nextVideo}
+                        onDismiss={onDismissNextVideoPopup}
+                        onNextVideoRequested={onNextVideoRequested}
+                    />
+                    :
+                    null
+            }
+            <Transition when={statisticsMenuOpen} name={'fade'}>
+                <StatisticsMenu
+                    className={classnames(styles['layer'], styles['menu-layer'])}
+                    {...statistics}
+                />
+            </Transition>
+            <Transition when={sideDrawerOpen} name={'slide-left'}>
+                <SideDrawer
+                    className={classnames(styles['layer'], styles['side-drawer-layer'])}
+                    metaItem={player.metaItem?.content}
+                    seriesInfo={player.seriesInfo}
+                    closeSideDrawer={closeSideDrawer}
+                    selected={player.selected?.streamRequest?.path.id}
+                />
+            </Transition>
+            <Transition when={subtitlesMenuOpen} name={'fade'}>
+                <SubtitlesMenu
+                    className={classnames(styles['layer'], styles['menu-layer'])}
+                    {...subtitlesMenuProps}
+                />
+            </Transition>
+            <Transition when={audioMenuOpen} name={'fade'}>
+                <AudioMenu
+                    className={classnames(styles['layer'], styles['menu-layer'])}
                     audioTracks={video.state.audioTracks}
-                    metaItem={player.metaItem}
-                    nextVideo={player.nextVideo}
-                    stream={player.selected !== null ? player.selected.stream : null}
-                    statistics={statistics}
-                    onPlayRequested={onPlayRequested}
-                    onPauseRequested={onPauseRequested}
-                    onNextVideoRequested={onNextVideoRequested}
-                    onMuteRequested={onMuteRequested}
-                    onUnmuteRequested={onUnmuteRequested}
-                    onVolumeChangeRequested={onVolumeChangeRequested}
-                    onSeekRequested={onSeekRequested}
-                    onToggleOptionsMenu={toggleOptionsMenu}
-                    onToggleSubtitlesMenu={toggleSubtitlesMenu}
-                    onToggleAudioMenu={toggleAudioMenu}
-                    onToggleSpeedMenu={toggleSpeedMenu}
-                    videoScale={video.state.videoScale}
-                    videoScaleLabel={VIDEO_SCALE_LABELS[video.state.videoScale || 'contain']}
-                    onVideoScaleChanged={onVideoScaleChanged}
-                    onToggleStatisticsMenu={toggleStatisticsMenu}
-                    onToggleSideDrawer={toggleSideDrawer}
-                    onMouseMove={onBarMouseMove}
-                    onMouseOver={onBarMouseMove}
-                    onTouchEnd={onContainerMouseLeave}
+                    selectedAudioTrackId={video.state.selectedAudioTrackId}
+                    onAudioTrackSelected={onAudioTrackSelected}
                 />
-                <Indicator
-                    className={classnames(styles['layer'], styles['indicator-layer'])}
-                    videoState={video.state}
-                    disabled={subtitlesMenuOpen}
+            </Transition>
+            <Transition when={speedMenuOpen} name={'fade'}>
+                <SpeedMenu
+                    className={classnames(styles['layer'], styles['menu-layer'])}
+                    playbackSpeed={video.state.playbackSpeed}
+                    onPlaybackSpeedChanged={onPlaybackSpeedChanged}
                 />
-                {
-                    nextVideoPopupOpen ?
-                        <NextVideoPopup
-                            className={classnames(styles['layer'], styles['menu-layer'])}
-                            metaItem={player.metaItem !== null && player.metaItem.type === 'Ready' ? player.metaItem.content : null}
-                            nextVideo={player.nextVideo}
-                            onDismiss={onDismissNextVideoPopup}
-                            onNextVideoRequested={onNextVideoRequested}
-                        />
-                        :
-                        null
-                }
-                <Transition when={statisticsMenuOpen} name={'fade'}>
-                    <StatisticsMenu
-                        className={classnames(styles['layer'], styles['menu-layer'])}
-                        {...statistics}
-                    />
-                </Transition>
-                <Transition when={sideDrawerOpen} name={'slide-left'}>
-                    <SideDrawer
-                        className={classnames(styles['layer'], styles['side-drawer-layer'])}
-                        metaItem={player.metaItem?.content}
-                        seriesInfo={player.seriesInfo}
-                        closeSideDrawer={closeSideDrawer}
-                        selected={player.selected?.streamRequest?.path.id}
-                    />
-                </Transition>
-                <Transition when={subtitlesMenuOpen} name={'fade'}>
-                    <SubtitlesMenu
-                        className={classnames(styles['layer'], styles['menu-layer'])}
-                        {...subtitlesMenuProps}
-                    />
-                </Transition>
-                <Transition when={audioMenuOpen} name={'fade'}>
-                    <AudioMenu
-                        className={classnames(styles['layer'], styles['menu-layer'])}
-                        audioTracks={video.state.audioTracks}
-                        selectedAudioTrackId={video.state.selectedAudioTrackId}
-                        onAudioTrackSelected={onAudioTrackSelected}
-                    />
-                </Transition>
-                <Transition when={speedMenuOpen} name={'fade'}>
-                    <SpeedMenu
-                        className={classnames(styles['layer'], styles['menu-layer'])}
-                        playbackSpeed={video.state.playbackSpeed}
-                        onPlaybackSpeedChanged={onPlaybackSpeedChanged}
-                    />
-                </Transition>
-                <Transition when={optionsMenuOpen} name={'fade'}>
-                    <OptionsMenu
-                        className={classnames(styles['layer'], styles['menu-layer'])}
-                        stream={player.selected?.stream}
-                        playbackDevices={playbackDevices}
-                        extraSubtitlesTracks={extraSubtitleTracks}
-                        selectedExtraSubtitlesTrackId={selectedExtraSubtitleTrackId}
-                    />
-                </Transition>
+            </Transition>
+            <Transition when={optionsMenuOpen} name={'fade'}>
+                <OptionsMenu
+                    className={classnames(styles['layer'], styles['menu-layer'])}
+                    stream={player.selected?.stream}
+                    playbackDevices={playbackDevices}
+                    extraSubtitlesTracks={extraSubtitleTracks}
+                    selectedExtraSubtitlesTrackId={selectedExtraSubtitleTrackId}
+                />
+            </Transition>
         </div>
     );
 };
