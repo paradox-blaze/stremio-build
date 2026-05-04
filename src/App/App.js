@@ -6,7 +6,7 @@ const { useTranslation } = require('react-i18next');
 const { Router } = require('stremio-router');
 const { Core, Shell, Chromecast, DragAndDrop, KeyboardShortcuts, ServicesProvider, GamepadProvider } = require('stremio/services');
 const { NotFound } = require('stremio/routes');
-const { FileDropProvider, PlatformProvider, ToastProvider, TooltipProvider, ShortcutsProvider, CONSTANTS, withCoreSuspender, useShell, useBinaryState } = require('stremio/common');
+const { FileDropProvider, FullscreenProvider, PlatformProvider, ToastProvider, TooltipProvider, ShortcutsProvider, CONSTANTS, withCoreSuspender, useShell, useBinaryState } = require('stremio/common');
 const ServicesToaster = require('./ServicesToaster');
 const DeepLinkHandler = require('./DeepLinkHandler');
 const SearchParamsHandler = require('./SearchParamsHandler');
@@ -231,21 +231,23 @@ const App = () => {
                                         <FileDropProvider className={styles['file-drop-container']}>
                                             <GamepadProvider enabled={gamepadSupportEnabled} onGuide={toggleGamepadModal}>
                                                 <ShortcutsProvider onShortcut={onShortcut}>
-                                                    {
-                                                        shortcutModalOpen && <ShortcutsModal onClose={closeShortcutsModal}/>
-                                                    }
-                                                    {
-                                                        gamepadModalOpen && <GamepadModal onClose={closeGamepadModal}/>
-                                                    }
-                                                    <ServicesToaster />
-                                                    <DeepLinkHandler />
-                                                    <SearchParamsHandler />
-                                                    <UpdaterBanner className={styles['updater-banner-container']} />
-                                                    <RouterWithProtectedRoutes
-                                                        className={styles['router']}
-                                                        viewsConfig={routerViewsConfig}
-                                                        onPathNotMatch={onPathNotMatch}
-                                                    />
+                                                    <FullscreenProvider>
+                                                        {
+                                                            shortcutModalOpen && <ShortcutsModal onClose={closeShortcutsModal}/>
+                                                        }
+                                                        {
+                                                            gamepadModalOpen && <GamepadModal onClose={closeGamepadModal}/>
+                                                        }
+                                                        <ServicesToaster />
+                                                        <DeepLinkHandler />
+                                                        <SearchParamsHandler />
+                                                        <UpdaterBanner className={styles['updater-banner-container']} />
+                                                        <RouterWithProtectedRoutes
+                                                            className={styles['router']}
+                                                            viewsConfig={routerViewsConfig}
+                                                            onPathNotMatch={onPathNotMatch}
+                                                        />
+                                                    </FullscreenProvider>
                                                 </ShortcutsProvider>
                                             </GamepadProvider>
                                         </FileDropProvider>

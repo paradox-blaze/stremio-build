@@ -13,9 +13,8 @@ const useMediaSession = (
 
     // Playback state
     useEffect(() => {
-        const playbackState = !videoState.paused ? 'playing' : 'paused';
-
         if (navigator.mediaSession) {
+            const playbackState = videoState.paused === null ? 'none' : videoState.paused ? 'paused' : 'playing';
             navigator.mediaSession.playbackState = playbackState;
         }
 
@@ -85,6 +84,9 @@ const useMediaSession = (
         shell.on('media.status', onMediaStatus);
 
         return () => {
+            navigator.mediaSession.setActionHandler('play', null);
+            navigator.mediaSession.setActionHandler('pause', null);
+            navigator.mediaSession.setActionHandler('nexttrack', null);
             shell.on('media.status', onMediaStatus);
         };
     }, [player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested]);
