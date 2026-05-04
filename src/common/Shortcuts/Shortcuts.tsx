@@ -25,7 +25,7 @@ const ShortcutsProvider = ({ children, onShortcut }: Props) => {
     const listeners = useRef<Map<ShortcutName, Set<ShortcutListener>>>(new Map());
     const lastRepeatTime = useRef<Map<string, number>>(new Map());
 
-    const onKeyDown = useCallback(({ ctrlKey, shiftKey, code, key, repeat }: KeyboardEvent) => {
+    const onKeyDown = useCallback(({ ctrlKey, shiftKey, altKey, metaKey, code, key, repeat }: KeyboardEvent) => {
         if (repeat) {
             const now = Date.now();
             const last = lastRepeatTime.current.get(code) ?? 0;
@@ -34,8 +34,10 @@ const ShortcutsProvider = ({ children, onShortcut }: Props) => {
         }
 
         SHORTCUTS.forEach(({ name, combos }) => combos.forEach((keys) => {
-            const modifers = (keys.includes('Ctrl') ? ctrlKey : true)
-                && (keys.includes('Shift') ? shiftKey : true);
+            const modifers = (keys.includes('Ctrl') === ctrlKey)
+                && (keys.includes('Shift') === shiftKey)
+                && !altKey
+                && !metaKey;
 
             if (modifers && (keys.includes(code) || keys.includes(key.toUpperCase()))) {
                 const combo = combos.indexOf(keys);

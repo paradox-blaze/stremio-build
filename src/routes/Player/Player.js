@@ -658,7 +658,7 @@ const Player = ({ urlParams, queryParams }) => {
 
         const onKeyDown = (e) => {
             if (e.code !== 'Space' || e.repeat) return;
-            if (menusOpen) return;
+            if (menusOpen || e.ctrlKey || e.metaKey || e.altKey) return;
 
             longPress.current = false;
 
@@ -670,6 +670,7 @@ const Player = ({ urlParams, queryParams }) => {
 
         const onKeyUp = (e) => {
             if (e.code !== 'Space' && e.code !== 'ArrowRight' && e.code !== 'ArrowLeft') return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
 
             if (e.code === 'ArrowRight' || e.code === 'ArrowLeft') {
                 setSeeking(false);
