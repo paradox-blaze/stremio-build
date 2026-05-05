@@ -55,6 +55,7 @@
         "@types/hat": "^0.0.4",
         "@types/lodash.throttle": "^4.1.9",
         "@types/magnet-uri": "^5.1.5",
+        "@types/node": "^25.6.0",
         "@types/react": "^18.3.28",
         "@types/react-dom": "^18.3.7",
         "babel-loader": "10.1.1",

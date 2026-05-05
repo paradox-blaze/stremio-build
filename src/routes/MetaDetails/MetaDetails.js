@@ -4,7 +4,7 @@ const React = require('react');
 const { useTranslation } = require('react-i18next');
 const PropTypes = require('prop-types');
 const classnames = require('classnames');
-const { useServices } = require('stremio/services');
+const { useCore } = require('stremio/core');
 const { useContentGamepadNavigation } = require('stremio/services/GamepadNavigation');
 const { withCoreSuspender } = require('stremio/common');
 const { VerticalNavBar, HorizontalNavBar, DelayedRenderer, Image, MetaPreview, ModalDialog } = require('stremio/components');
@@ -18,7 +18,7 @@ const styles = require('./styles');
 const MetaDetails = ({ urlParams, queryParams }) => {
     const contentRef = React.useRef(null);
     const { t } = useTranslation();
-    const { core } = useServices();
+    const core = useCore();
     const metaDetails = useMetaDetails(urlParams);
     const [season, setSeason] = useSeason(urlParams, queryParams);
     const [tabs, metaExtension, clearMetaExtension] = useMetaExtensionTabs(metaDetails.metaExtensions);
