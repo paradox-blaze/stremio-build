@@ -23,8 +23,8 @@ const NavMenuContent = ({ onClick }) => {
     const streamingServer = useStreamingServer();
     const { handlePlayUrl } = usePlayUrl();
     const toast = useToast();
-    const [fullscreen, requestFullscreen, exitFullscreen] = useFullscreen();
-    const [isIOSPWA, isAndroidPWA] = usePWA();
+    const [fullscreen, requestFullscreen, exitFullscreen, , supported] = useFullscreen();
+    const [, isAndroidPWA] = usePWA();
     const streamingServerWarningDismissed = React.useMemo(() => {
         return streamingServer.settings !== null && streamingServer.settings.type === 'Ready' || (
             !isNaN(profile.settings.streamingServerWarningDismissed.getTime()) &&
@@ -79,7 +79,7 @@ const NavMenuContent = ({ onClick }) => {
                 </div>
             </div>
             {
-                !isIOSPWA && !isAndroidPWA ?
+                supported && !isAndroidPWA ?
                     <div className={styles['nav-menu-section']}>
                         <Button className={styles['nav-menu-option-container']} title={fullscreen ? t('EXIT_FULLSCREEN') : t('ENTER_FULLSCREEN')} onClick={fullscreen ? exitFullscreen : requestFullscreen}>
                             <Icon className={styles['icon']} name={fullscreen ? 'minimize' : 'maximize'} />

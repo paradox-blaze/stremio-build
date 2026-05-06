@@ -94,9 +94,11 @@ const FullscreenProvider = ({ children }: Props) => {
         };
     }, [shell, toggleFullscreen, exitFullscreen, escExitFullscreen]);
 
+    const supported = shell.active || document.fullscreenEnabled === true;
+
     const value = useMemo<FullscreenContextValue>(
-        () => [fullscreen, requestFullscreen, exitFullscreen, toggleFullscreen],
-        [fullscreen, requestFullscreen, exitFullscreen, toggleFullscreen]
+        () => [fullscreen, requestFullscreen, exitFullscreen, toggleFullscreen, supported],
+        [fullscreen, requestFullscreen, exitFullscreen, toggleFullscreen, supported]
     );
 
     return (
