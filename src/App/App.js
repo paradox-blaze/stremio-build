@@ -5,9 +5,9 @@ const React = require('react');
 const { useTranslation } = require('react-i18next');
 const { useCore } = require('stremio/core');
 const { Router } = require('stremio-router');
-const { Shell, Chromecast, DragAndDrop, KeyboardShortcuts, ServicesProvider, GamepadProvider } = require('stremio/services');
+const { Shell, Chromecast, KeyboardShortcuts, ServicesProvider, GamepadProvider } = require('stremio/services');
 const { NotFound } = require('stremio/routes');
-const { FileDropProvider, FullscreenProvider, PlatformProvider, ToastProvider, TooltipProvider, ShortcutsProvider, CONSTANTS, useShell, useBinaryState, useProfile, withCoreSuspender } = require('stremio/common');
+const { FullscreenProvider, PlatformProvider, ToastProvider, TooltipProvider, ShortcutsProvider, CONSTANTS, useShell, useBinaryState, useProfile, withCoreSuspender, onFileDrop } = require('stremio/common');
 const ServicesToaster = require('./ServicesToaster');
 const DeepLinkHandler = require('./DeepLinkHandler');
 const SearchParamsHandler = require('./SearchParamsHandler');
@@ -34,7 +34,6 @@ const App = () => {
             shell: new Shell(),
             chromecast: new Chromecast(),
             keyboardShortcuts: new KeyboardShortcuts(),
-            dragAndDrop: new DragAndDrop({ core })
         };
     }, []);
     const [shortcutModalOpen,, closeShortcutsModal, toggleShortcutModal] = useBinaryState(false);
@@ -50,6 +49,16 @@ const App = () => {
                 break;
         }
     }, [toggleShortcutModal, toggleGamepadModal]);
+
+    onFileDrop(['application/x-bittorrent'], (file, buffer) => {
+        core.transport.dispatch({
+            action: 'StreamingServer',
+            args: {
+                action: 'CreateTorrent',
+                args: Array.from(new Uint8Array(buffer))
+            }
+        });
+    });
 
     React.useEffect(() => {
         let prevPath = window.location.hash.slice(1);
@@ -82,13 +91,11 @@ const App = () => {
         services.shell.start();
         services.chromecast.start();
         services.keyboardShortcuts.start();
-        services.dragAndDrop.start();
         window.services = services;
         return () => {
             services.shell.stop();
             services.chromecast.stop();
             services.keyboardShortcuts.stop();
-            services.dragAndDrop.stop();
             services.chromecast.off('stateChanged', onChromecastStateChange);
         };
     }, []);
@@ -174,29 +181,27 @@ const App = () => {
             <PlatformProvider>
                 <ToastProvider className={styles['toasts-container']}>
                     <TooltipProvider className={styles['tooltip-container']}>
-                        <FileDropProvider className={styles['file-drop-container']}>
-                            <GamepadProvider enabled={gamepadSupportEnabled} onGuide={toggleGamepadModal}>
-                                <ShortcutsProvider onShortcut={onShortcut}>
-                                    <FullscreenProvider>
-                                        {
-                                            shortcutModalOpen && <ShortcutsModal onClose={closeShortcutsModal}/>
-                                        }
-                                        {
-                                            gamepadModalOpen && <GamepadModal onClose={closeGamepadModal}/>
-                                        }
-                                        <ServicesToaster />
-                                        <DeepLinkHandler />
-                                        <SearchParamsHandler />
-                                        <UpdaterBanner className={styles['updater-banner-container']} />
-                                        <RouterWithProtectedRoutes
-                                            className={styles['router']}
-                                            viewsConfig={routerViewsConfig}
-                                            onPathNotMatch={onPathNotMatch}
-                                        />
-                                    </FullscreenProvider>
-                                </ShortcutsProvider>
-                            </GamepadProvider>
-                        </FileDropProvider>
+                        <GamepadProvider enabled={gamepadSupportEnabled} onGuide={toggleGamepadModal}>
+                            <ShortcutsProvider onShortcut={onShortcut}>
+                                <FullscreenProvider>
+                                    {
+                                        shortcutModalOpen && <ShortcutsModal onClose={closeShortcutsModal}/>
+                                    }
+                                    {
+                                        gamepadModalOpen && <GamepadModal onClose={closeGamepadModal}/>
+                                    }
+                                    <ServicesToaster />
+                                    <DeepLinkHandler />
+                                    <SearchParamsHandler />
+                                    <UpdaterBanner className={styles['updater-banner-container']} />
+                                    <RouterWithProtectedRoutes
+                                        className={styles['router']}
+                                        viewsConfig={routerViewsConfig}
+                                        onPathNotMatch={onPathNotMatch}
+                                    />
+                                </FullscreenProvider>
+                            </ShortcutsProvider>
+                        </GamepadProvider>
                     </TooltipProvider>
                 </ToastProvider>
             </PlatformProvider>

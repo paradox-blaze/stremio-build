@@ -18,6 +18,7 @@ const { initReactI18next } = require('react-i18next');
 const stremioTranslations = require('stremio-translations');
 const App = require('./App');
 const { CoreProvider } = require('./core');
+const { FileDropProvider } = require('./common');
 
 const translations = Object.fromEntries(Object.entries(stremioTranslations()).map(([key, value]) => [key, {
     translation: value
@@ -42,7 +43,9 @@ const appInfo = {
 const root = ReactDOM.createRoot(document.getElementById('app'));
 root.render(
     <CoreProvider appInfo={appInfo}>
-        <App />
+        <FileDropProvider>
+            <App />
+        </FileDropProvider>
     </CoreProvider>
 );
 

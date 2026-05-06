@@ -151,8 +151,8 @@ const useSubtitles = ({
         streamStateChanged({ subtitleOffset: offset });
     }, [streamStateChanged, video]);
 
-    onFileDrop(CONSTANTS.SUPPORTED_LOCAL_SUBTITLES, (filename: string, buffer: ArrayBuffer) => {
-        videoRef.current.addLocalSubtitles(filename, buffer);
+    onFileDrop(CONSTANTS.SUPPORTED_LOCAL_SUBTITLES, (file: File, buffer: ArrayBuffer) => {
+        videoRef.current.addLocalSubtitles(file.name, buffer);
     });
 
     useEffect(() => {
