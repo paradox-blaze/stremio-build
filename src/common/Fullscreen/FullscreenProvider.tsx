@@ -76,12 +76,18 @@ const FullscreenProvider = ({ children }: Props) => {
     onShortcut('fullscreen', toggleFullscreenFromShortcut, [toggleFullscreenFromShortcut]);
 
     useEffect(() => {
+        const videoElement = videoElementRef.current;
+
         const onWindowVisibilityChanged = (state: WindowVisibility) => {
             setFullscreen(state.isFullscreen === true);
         };
 
         const onFullscreenChange = () => {
             setFullscreen(document.fullscreenElement === document.documentElement);
+        };
+
+        const onWebkitFullscreenChange = () => {
+            setFullscreen((videoElement as any)?.webkitDisplayingFullscreen === true);
         };
 
         const onKeyDown = (event: KeyboardEvent) => {
@@ -97,15 +103,17 @@ const FullscreenProvider = ({ children }: Props) => {
         shell.on('win-visibility-changed', onWindowVisibilityChanged);
         document.addEventListener('keydown', onKeyDown);
         document.addEventListener('fullscreenchange', onFullscreenChange);
+        videoElement?.addEventListener('webkitbeginfullscreen', onWebkitFullscreenChange);
+        videoElement?.addEventListener('webkitendfullscreen', onWebkitFullscreenChange);
 
         return () => {
             shell.off('win-visibility-changed', onWindowVisibilityChanged);
             document.removeEventListener('keydown', onKeyDown);
             document.removeEventListener('fullscreenchange', onFullscreenChange);
+            videoElement?.removeEventListener('webkitbeginfullscreen', onWebkitFullscreenChange);
+            videoElement?.removeEventListener('webkitendfullscreen', onWebkitFullscreenChange);
         };
-    }, [shell, toggleFullscreen, exitFullscreen, escExitFullscreen]);
-
-    const supported = shell.active || document.fullscreenEnabled === true;
+    }, [shell, toggleFullscreen, exitFullscreen, escExitFullscreen, hasVideoElement]);
 
     const value = useMemo<FullscreenContextValue>(
         () => [fullscreen, requestFullscreen, exitFullscreen, toggleFullscreen, supported, setVideoElement],
