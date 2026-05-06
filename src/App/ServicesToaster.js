@@ -1,14 +1,14 @@
 // Copyright (C) 2017-2023 Smart code 203358507
 
 const React = require('react');
-const { useServices } = require('stremio/services');
 const { useCore } = require('stremio/core');
-const { useToast } = require('stremio/common');
+const { useToast, useFileDrop } = require('stremio/common');
 
 const ServicesToaster = () => {
-    const { dragAndDrop } = useServices();
     const core = useCore();
     const toast = useToast();
+    const filedrop = useFileDrop();
+
     React.useEffect(() => {
         const onCoreEvent = (name, data) => {
             switch (name) {
@@ -53,21 +53,23 @@ const ServicesToaster = () => {
                 }
             });
         };
-        const onDragAndDropError = (error) => {
-            toast.show({
-                type: 'error',
-                title: error.message,
-                message: error.file?.name,
-                timeout: 4000
-            });
+        const onFileDrop = (file, buffer, supported) => {
+            if (!supported) {
+                toast.show({
+                    type: 'error',
+                    title: 'Unsupported file',
+                    message: file.name,
+                    timeout: 4000
+                });
+            }
         };
         core.on('event', onCoreEvent);
         core.on('error', onCoreError);
-        dragAndDrop.on('error', onDragAndDropError);
+        filedrop.on('*', onFileDrop);
         return () => {
             core.off('event', onCoreEvent);
             core.off('error', onCoreError);
-            dragAndDrop.off('error', onDragAndDropError);
+            filedrop.off('*', onFileDrop);
         };
     }, []);
     return null;
