@@ -5,7 +5,7 @@ const PropTypes = require('prop-types');
 const classnames = require('classnames');
 const { useTranslation } = require('react-i18next');
 const { default: Icon } = require('@stremio/stremio-icons/react');
-const { useServices } = require('stremio/services');
+const { useCore } = require('stremio/core');
 const { Button } = require('stremio/components');
 const { useFullscreen } = require('stremio/common/Fullscreen');
 const useProfile = require('stremio/common/useProfile');
@@ -18,7 +18,7 @@ const styles = require('./styles');
 
 const NavMenuContent = ({ onClick }) => {
     const { t } = useTranslation();
-    const { core } = useServices();
+    const core = useCore();
     const profile = useProfile();
     const streamingServer = useStreamingServer();
     const { handlePlayUrl } = usePlayUrl();
