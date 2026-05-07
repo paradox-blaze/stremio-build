@@ -18,8 +18,8 @@ importers:
         specifier: 5.2.0
         version: 5.2.0
       '@stremio/stremio-core-web':
-        specifier: 0.56.4
-        version: 0.56.4
+        specifier: 0.57.0
+        version: 0.57.0
       '@stremio/stremio-icons':
         specifier: 5.10.0
         version: 5.10.0
@@ -123,12 +123,12 @@ importers:
       '@types/lodash.throttle':
         specifier: ^4.1.9
         version: 4.1.9
-      '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
       '@types/magnet-uri':
         specifier: ^5.1.5
         version: 5.1.5
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
       '@types/react':
         specifier: ^18.3.28
         version: 18.3.28
@@ -1394,8 +1394,8 @@ packages:
   '@stremio/stremio-colors@5.2.0':
     resolution: {integrity: sha512-dYlPgu9W/H7c9s1zmW5tiDnRenaUa4Hg1QCyOg1lhOcgSfM/bVTi5nnqX+IfvGTTUNA0zgzh8hI3o3miwnZxTg==}
 
-  '@stremio/stremio-core-web@0.56.4':
-    resolution: {integrity: sha512-tFAMYgKrJ1bkvHRMpxDykM/844sDjgRPFk6FLhjQiwh01OHIyEgDqGo/NgwFM+CuMR4mW676SDvwNHkK0Xqg3w==}
+  '@stremio/stremio-core-web@0.57.0':
+    resolution: {integrity: sha512-go8GZwGm6MFfjez6J/T1HrGNY2330EU3VoVinDYR0rE331aay6fenViLyCYLE829FTebW2eglrmc7MdHjmhqSA==}
 
   '@stremio/stremio-icons@5.10.0':
     resolution: {integrity: sha512-Zw/vGC3D2yeQfk8xv/tfMJTDvbCPOI91tBg4XpR2+EgbZSX8Xvm7Vz457PIhFPhTAwdOPHp0VX0M3gzjbt0zOg==}
@@ -1496,9 +1496,6 @@ packages:
 
   '@types/mime@1.3.5':
     resolution: {integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==}
-
-  '@types/node-forge@1.3.14':
-    resolution: {integrity: sha512-mhVF2BnD4BO+jtOp7z1CdzaK4mbuK0LLQYAvdOLqHTavxFNq4zA1EmYkpnFjP8HOUzedfQkRnp0E2ulSAYSzAw==}
 
   '@types/node@25.6.0':
     resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
@@ -6447,7 +6444,7 @@ snapshots:
 
   '@stremio/stremio-colors@5.2.0': {}
 
-  '@stremio/stremio-core-web@0.56.4':
+  '@stremio/stremio-core-web@0.57.0':
     dependencies:
       '@babel/runtime': 7.24.1
 
