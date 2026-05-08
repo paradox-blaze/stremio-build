@@ -19,11 +19,6 @@
                 "combos": [["Backspace"], ["Ctrl", "Backspace"]]
             },
             {
-                "name": "exit",
-                "label": "SETTINGS_SHORTCUT_EXIT_BACK",
-                "combos": [["Backspace"]]
-            },
-            {
                 "name": "fullscreen",
                 "label": "SETTINGS_SHORTCUT_FULLSCREEN",
                 "combos": [["F"]]
@@ -128,6 +123,11 @@
                 "name": "playNext",
                 "label": "SETTINGS_SHORTCUT_PLAY_NEXT",
                 "combos": [["Shift", "N"]]
+            },
+            {
+                "name": "exit",
+                "label": "SETTINGS_SHORTCUT_EXIT_BACK",
+                "combos": [["Escape"]]
             }
         ]
     }

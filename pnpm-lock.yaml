@@ -18,8 +18,8 @@ importers:
         specifier: 5.2.0
         version: 5.2.0
       '@stremio/stremio-core-web':
-        specifier: 0.56.4
-        version: 0.56.4
+        specifier: 0.57.0
+        version: 0.57.0
       '@stremio/stremio-icons':
         specifier: 5.10.0
         version: 5.10.0
@@ -1394,8 +1394,8 @@ packages:
   '@stremio/stremio-colors@5.2.0':
     resolution: {integrity: sha512-dYlPgu9W/H7c9s1zmW5tiDnRenaUa4Hg1QCyOg1lhOcgSfM/bVTi5nnqX+IfvGTTUNA0zgzh8hI3o3miwnZxTg==}
 
-  '@stremio/stremio-core-web@0.56.4':
-    resolution: {integrity: sha512-tFAMYgKrJ1bkvHRMpxDykM/844sDjgRPFk6FLhjQiwh01OHIyEgDqGo/NgwFM+CuMR4mW676SDvwNHkK0Xqg3w==}
+  '@stremio/stremio-core-web@0.57.0':
+    resolution: {integrity: sha512-go8GZwGm6MFfjez6J/T1HrGNY2330EU3VoVinDYR0rE331aay6fenViLyCYLE829FTebW2eglrmc7MdHjmhqSA==}
 
   '@stremio/stremio-icons@5.10.0':
     resolution: {integrity: sha512-Zw/vGC3D2yeQfk8xv/tfMJTDvbCPOI91tBg4XpR2+EgbZSX8Xvm7Vz457PIhFPhTAwdOPHp0VX0M3gzjbt0zOg==}
@@ -6444,7 +6444,7 @@ snapshots:
 
   '@stremio/stremio-colors@5.2.0': {}
 
-  '@stremio/stremio-core-web@0.56.4':
+  '@stremio/stremio-core-web@0.57.0':
     dependencies:
       '@babel/runtime': 7.24.1
 
