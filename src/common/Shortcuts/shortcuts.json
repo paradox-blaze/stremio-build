@@ -14,14 +14,19 @@
                 "combos": [["0"]]
             },
             {
-                "name": "fullscreen",
-                "label": "SETTINGS_SHORTCUT_FULLSCREEN",
-                "combos": [["F"]]
+                "name": "navigateHistory",
+                "label": "SETTINGS_SHORTCUT_NAVIGATE_HISTORY",
+                "combos": [["Backspace"], ["Ctrl", "Backspace"]]
             },
             {
                 "name": "exit",
                 "label": "SETTINGS_SHORTCUT_EXIT_BACK",
                 "combos": [["Backspace"]]
+            },
+            {
+                "name": "fullscreen",
+                "label": "SETTINGS_SHORTCUT_FULLSCREEN",
+                "combos": [["F"]]
             },
             {
                 "name": "shortcuts",
