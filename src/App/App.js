@@ -5,7 +5,7 @@ const React = require('react');
 const { useTranslation } = require('react-i18next');
 const { useCore } = require('stremio/core');
 const { Router } = require('stremio-router');
-const { Shell, Chromecast, KeyboardShortcuts, ServicesProvider, GamepadProvider } = require('stremio/services');
+const { Shell, Chromecast, ServicesProvider, GamepadProvider } = require('stremio/services');
 const { NotFound } = require('stremio/routes');
 const { FullscreenProvider, PlatformProvider, ToastProvider, TooltipProvider, ShortcutsProvider, CONSTANTS, useShell, useBinaryState, useProfile, withCoreSuspender, onFileDrop } = require('stremio/common');
 const ServicesToaster = require('./ServicesToaster');
@@ -33,19 +33,30 @@ const App = () => {
         return {
             shell: new Shell(),
             chromecast: new Chromecast(),
-            keyboardShortcuts: new KeyboardShortcuts(),
         };
     }, []);
     const [shortcutModalOpen,, closeShortcutsModal, toggleShortcutModal] = useBinaryState(false);
     const [gamepadModalOpen,, closeGamepadModal, toggleGamepadModal] = useBinaryState(false);
 
-    const onShortcut = React.useCallback((name) => {
+    const onShortcut = React.useCallback((name, combo, key) => {
         switch (name) {
             case 'shortcuts':
                 toggleShortcutModal();
                 break;
             case 'gamepadGuide':
                 toggleGamepadModal();
+                break;
+            case 'navigateSearch':
+                window.location = '#/search';
+                break;
+            case 'navigateTabs': {
+                const routes = ['', 'discover', 'library', 'calendar', 'addons', 'settings'];
+                const index = key - 1;
+                if (index in routes) window.location = `#/${routes[index]}`;
+                break;
+            }
+            case 'navigateHistory':
+                combo === 0 ? window.history.back() : window.history.forward();
                 break;
         }
     }, [toggleShortcutModal, toggleGamepadModal]);
@@ -90,12 +101,10 @@ const App = () => {
         services.chromecast.on('stateChanged', onChromecastStateChange);
         services.shell.start();
         services.chromecast.start();
-        services.keyboardShortcuts.start();
         window.services = services;
         return () => {
             services.shell.stop();
             services.chromecast.stop();
-            services.keyboardShortcuts.stop();
             services.chromecast.off('stateChanged', onChromecastStateChange);
         };
     }, []);
