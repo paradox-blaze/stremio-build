@@ -19,11 +19,6 @@
                 "combos": [["F"]]
             },
             {
-                "name": "exit",
-                "label": "SETTINGS_SHORTCUT_EXIT_BACK",
-                "combos": [["Backspace"]]
-            },
-            {
                 "name": "shortcuts",
                 "label": "SETTINGS_SHORTCUT_SHORTCUTS",
                 "combos": [["Ctrl", "/"]]
@@ -123,6 +118,11 @@
                 "name": "playNext",
                 "label": "SETTINGS_SHORTCUT_PLAY_NEXT",
                 "combos": [["Shift", "N"]]
+            },
+            {
+                "name": "exit",
+                "label": "SETTINGS_SHORTCUT_EXIT_BACK",
+                "combos": [["Escape"]]
             }
         ]
     }
