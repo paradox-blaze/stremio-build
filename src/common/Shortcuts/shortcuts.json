@@ -14,6 +14,11 @@
                 "combos": [["0"]]
             },
             {
+                "name": "navigateHistory",
+                "label": "SETTINGS_SHORTCUT_NAVIGATE_HISTORY",
+                "combos": [["Backspace"], ["Ctrl", "Backspace"]]
+            },
+            {
                 "name": "fullscreen",
                 "label": "SETTINGS_SHORTCUT_FULLSCREEN",
                 "combos": [["F"]]
