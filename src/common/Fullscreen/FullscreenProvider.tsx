@@ -11,16 +11,6 @@ type Props = {
     children: React.ReactNode,
 };
 
-const isTextInputFocused = () => {
-    const activeElement = document.activeElement;
-
-    return activeElement instanceof HTMLElement &&
-        (activeElement.tagName === 'INPUT' ||
-            activeElement.tagName === 'TEXTAREA' ||
-            activeElement.tagName === 'SELECT' ||
-            activeElement.isContentEditable);
-};
-
 const hasWebkitFullscreen = typeof HTMLVideoElement !== 'undefined' &&
     typeof HTMLVideoElement.prototype.webkitEnterFullscreen === 'function';
 
@@ -48,7 +38,11 @@ const FullscreenProvider = ({ children }: Props) => {
         if (shell.active) {
             shell.send('win-set-visibility', { fullscreen: true });
         } else if (document.fullscreenEnabled) {
-            await document.documentElement.requestFullscreen();
+            try {
+                await document.documentElement.requestFullscreen();
+            } catch (err) {
+                console.error('Error enabling fullscreen', err);
+            }
         } else if (videoElementRef.current && hasWebkitFullscreen) {
             (videoElementRef.current as any).webkitEnterFullscreen();
         }
@@ -68,12 +62,7 @@ const FullscreenProvider = ({ children }: Props) => {
         fullscreen ? exitFullscreen() : requestFullscreen();
     }, [fullscreen, exitFullscreen, requestFullscreen]);
 
-    const toggleFullscreenFromShortcut = useCallback(() => {
-        if (isTextInputFocused()) return;
-        toggleFullscreen();
-    }, [toggleFullscreen]);
-
-    onShortcut('fullscreen', toggleFullscreenFromShortcut, [toggleFullscreenFromShortcut]);
+    onShortcut('fullscreen', toggleFullscreen, [toggleFullscreen]);
 
     useEffect(() => {
         const videoElement = videoElementRef.current;

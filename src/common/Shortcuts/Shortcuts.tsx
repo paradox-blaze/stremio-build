@@ -16,16 +16,26 @@ const ShortcutsContext = createContext<ShortcutsContext>({} as ShortcutsContext)
 
 type Props = {
     children: JSX.Element,
-    onShortcut: (name: ShortcutName) => void,
+    onShortcut: (name: ShortcutName, combo: number, key: string) => void,
 };
 
 const REPEAT_THROTTLE_MS = 130;
+
+const isInputFocused = () => {
+    const inputElements = ['INPUT', 'TEXTAREA', 'SELECT'];
+    const activeElement = document.activeElement;
+
+    return activeElement instanceof HTMLElement &&
+        (inputElements.includes(activeElement.tagName) || activeElement.isContentEditable);
+};
 
 const ShortcutsProvider = ({ children, onShortcut }: Props) => {
     const listeners = useRef<Map<ShortcutName, Set<ShortcutListener>>>(new Map());
     const lastRepeatTime = useRef<Map<string, number>>(new Map());
 
     const onKeyDown = useCallback(({ ctrlKey, shiftKey, altKey, metaKey, code, key, repeat }: KeyboardEvent) => {
+        if (isInputFocused()) return;
+
         if (repeat) {
             const now = Date.now();
             const last = lastRepeatTime.current.get(code) ?? 0;
@@ -43,7 +53,7 @@ const ShortcutsProvider = ({ children, onShortcut }: Props) => {
                 const combo = combos.indexOf(keys);
                 listeners.current.get(name)?.forEach((listener) => listener(combo));
 
-                onShortcut(name as ShortcutName);
+                onShortcut(name as ShortcutName, combo, key);
             }
         }));
     }, [onShortcut]);

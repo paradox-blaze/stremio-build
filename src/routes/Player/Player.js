@@ -590,15 +590,10 @@ const Player = ({ urlParams, queryParams }) => {
         video.state.muted === true ? onUnmuteRequested() : onMuteRequested();
     }, [video.state.muted], !menusOpen);
 
-    onShortcut('volumeUp', () => {
+    onShortcut('volume', (combo) => {
         if (video.state.volume !== null) {
-            onVolumeChangeRequested(Math.min(video.state.volume + 5, 200));
-        }
-    }, [video.state.volume], !menusOpen);
-
-    onShortcut('volumeDown', () => {
-        if (video.state.volume !== null) {
-            onVolumeChangeRequested(Math.max(video.state.volume - 5, 0));
+            const volume = combo === 0 ? Math.min(video.state.volume + 5, 200) : Math.max(video.state.volume - 5, 0);
+            onVolumeChangeRequested(volume);
         }
     }, [video.state.volume], !menusOpen);
 
@@ -623,15 +618,10 @@ const Player = ({ urlParams, queryParams }) => {
         }
     }, [video.state.playbackSpeed, toggleSpeedMenu]);
 
-    onShortcut('speedUp', () => {
+    onShortcut('speed', (combo) => {
         if (video.state.playbackSpeed !== null) {
-            onPlaybackSpeedChanged(Math.min(video.state.playbackSpeed + 0.25, 2));
-        }
-    }, [video.state.playbackSpeed, onPlaybackSpeedChanged], !menusOpen);
-
-    onShortcut('speedDown', () => {
-        if (video.state.playbackSpeed !== null) {
-            onPlaybackSpeedChanged(Math.max(video.state.playbackSpeed - 0.25, 0.25));
+            const speed = combo === 0 ? Math.max(video.state.playbackSpeed - 0.25, 0.25) : Math.min(video.state.playbackSpeed + 0.25, 2);
+            onPlaybackSpeedChanged(speed);
         }
     }, [video.state.playbackSpeed, onPlaybackSpeedChanged], !menusOpen);
 
