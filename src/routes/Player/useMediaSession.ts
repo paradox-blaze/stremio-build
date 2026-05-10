@@ -5,11 +5,21 @@ import { MediaStatus } from 'stremio/common/useShell';
 const useMediaSession = (
     videoState: VideoState,
     player: Player,
+    fullscreen: boolean,
     onPlayRequested: () => void,
     onPauseRequested: () => void,
     onNextVideoRequested: () => void,
 ) => {
     const shell = useShell();
+
+    useEffect(() => {
+        if (!('audioSession' in navigator)) return;
+        const audioSession = (navigator as any).audioSession;
+        audioSession.type = fullscreen ? 'ambient' : 'playback';
+        return () => {
+            audioSession.type = 'playback';
+        };
+    }, [fullscreen]);
 
     // Playback state
     useEffect(() => {

@@ -8,6 +8,7 @@ export type FullscreenContextValue = readonly [
     exitFullscreen: () => void,
     toggleFullscreen: () => void,
     supported: boolean,
+    setVideoElement: (el: HTMLVideoElement | null) => void,
 ];
 
 const FullscreenContext = createContext<FullscreenContextValue | null>(null);

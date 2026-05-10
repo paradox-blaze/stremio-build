@@ -70,7 +70,13 @@ const Player = ({ urlParams, queryParams }) => {
 
     const [immersed, setImmersed] = React.useState(true);
     const setImmersedDebounced = React.useCallback(debounce(setImmersed, 3000), []);
-    const [, , , toggleFullscreen] = useFullscreen();
+    const [fullscreen, , , toggleFullscreen, , setVideoElement] = useFullscreen();
+
+    React.useEffect(() => {
+        const el = video.containerRef.current?.querySelector('video');
+        setVideoElement(el || null);
+        return () => setVideoElement(null);
+    }, [video.state.manifest]);
 
     const [optionsMenuOpen, , closeOptionsMenu, toggleOptionsMenu] = useBinaryState(false);
     const [subtitlesMenuOpen, , closeSubtitlesMenu, toggleSubtitlesMenu] = useBinaryState(false);
@@ -536,7 +542,7 @@ const Player = ({ urlParams, queryParams }) => {
         }
     }, [settings.pauseOnMinimize, shell.windowClosed, shell.windowHidden]);
 
-    useMediaSession(video.state, player, onPlayRequested, onPauseRequested, onNextVideoRequested);
+    useMediaSession(video.state, player, fullscreen, onPlayRequested, onPauseRequested, onNextVideoRequested);
 
     React.useEffect(() => {
         const onMediaKey = (action) => {
