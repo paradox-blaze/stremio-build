@@ -71,10 +71,18 @@ const VideosList = ({ className, metaItem, libraryItem, season, seasonOnSelect, 
         return videosForSeason.every((video) => video.watched);
     }, [videosForSeason]);
 
+    const videosContainerRef = React.useRef(null);
+
     const [search, setSearch] = React.useState('');
     const searchInputOnChange = React.useCallback((event) => {
         setSearch(event.currentTarget.value);
     }, []);
+
+    React.useEffect(() => {
+        if (videosContainerRef.current) {
+            videosContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [selectedSeason]);
 
     const onMarkVideoAsWatched = (video, watched) => {
         core.transport.dispatch({
@@ -154,7 +162,7 @@ const VideosList = ({ className, metaItem, libraryItem, season, seasonOnSelect, 
                                 value={search}
                                 onChange={searchInputOnChange}
                             />
-                            <div className={styles['videos-container']}>
+                            <div ref={videosContainerRef} className={styles['videos-container']}>
                                 {
                                     videosForSeason
                                         .filter((video) => {
