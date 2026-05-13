@@ -467,9 +467,8 @@ const Player = ({ urlParams, queryParams }) => {
     React.useEffect(() => {
         if (!defaultAudioTrackSelected.current) {
             const savedTrackId = player.streamState?.audioTrack?.id;
-            const audioTrack = savedTrackId ?
-                findTrackById(video.state.audioTracks, savedTrackId) :
-                findTrackByLang(video.state.audioTracks, settings.audioLanguage);
+            const savedTrack = savedTrackId ? findTrackById(video.state.audioTracks, savedTrackId) : null;
+            const audioTrack = savedTrack ?? findTrackByLang(video.state.audioTracks, settings.audioLanguage);
 
             if (audioTrack && audioTrack.id) {
                 video.setAudioTrack(audioTrack.id);
