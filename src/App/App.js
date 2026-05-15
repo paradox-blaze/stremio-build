@@ -5,9 +5,9 @@ const React = require('react');
 const { useTranslation } = require('react-i18next');
 const { useCore } = require('stremio/core');
 const { Router } = require('stremio-router');
-const { Shell, Chromecast, ServicesProvider, GamepadProvider } = require('stremio/services');
+const { Chromecast, ServicesProvider, GamepadProvider } = require('stremio/services');
 const { NotFound } = require('stremio/routes');
-const { FullscreenProvider, PlatformProvider, ToastProvider, TooltipProvider, ShortcutsProvider, CONSTANTS, useShell, useBinaryState, useProfile, withCoreSuspender, onFileDrop } = require('stremio/common');
+const { FullscreenProvider, ToastProvider, TooltipProvider, ShortcutsProvider, CONSTANTS, useBinaryState, useProfile, withCoreSuspender, onFileDrop, usePlatform } = require('stremio/common');
 const ServicesToaster = require('./ServicesToaster');
 const DeepLinkHandler = require('./DeepLinkHandler');
 const SearchParamsHandler = require('./SearchParamsHandler');
@@ -24,14 +24,13 @@ const App = () => {
     const core = useCore();
     const profile = useProfile();
     const { i18n } = useTranslation();
-    const shell = useShell();
+    const { shell } = usePlatform();
     const [gamepadSupportEnabled, setGamepadSupportEnabled] = React.useState(false);
     const onPathNotMatch = React.useCallback(() => {
         return NotFound;
     }, []);
     const services = React.useMemo(() => {
         return {
-            shell: new Shell(),
             chromecast: new Chromecast(),
         };
     }, []);
@@ -99,11 +98,9 @@ const App = () => {
             }
         };
         services.chromecast.on('stateChanged', onChromecastStateChange);
-        services.shell.start();
         services.chromecast.start();
         window.services = services;
         return () => {
-            services.shell.stop();
             services.chromecast.stop();
             services.chromecast.off('stateChanged', onChromecastStateChange);
         };
@@ -143,10 +140,10 @@ const App = () => {
             setGamepadSupportEnabled(profile.settings.gamepadSupport);
         }
 
-        if (profile.settings?.quitOnClose && shell.windowClosed) {
+        if (profile.settings?.quitOnClose && shell.state.windowClosed) {
             shell.send('quit');
         }
-    }, [profile.settings, shell.windowClosed]);
+    }, [profile.settings, shell.state.windowClosed]);
 
     React.useEffect(() => {
         const onWindowFocus = () => {
@@ -187,33 +184,31 @@ const App = () => {
 
     return (
         <ServicesProvider services={services}>
-            <PlatformProvider>
-                <ToastProvider className={styles['toasts-container']}>
-                    <TooltipProvider className={styles['tooltip-container']}>
-                        <GamepadProvider enabled={gamepadSupportEnabled} onGuide={toggleGamepadModal}>
-                            <ShortcutsProvider onShortcut={onShortcut}>
-                                <FullscreenProvider>
-                                    {
-                                        shortcutModalOpen && <ShortcutsModal onClose={closeShortcutsModal}/>
-                                    }
-                                    {
-                                        gamepadModalOpen && <GamepadModal onClose={closeGamepadModal}/>
-                                    }
-                                    <ServicesToaster />
-                                    <DeepLinkHandler />
-                                    <SearchParamsHandler />
-                                    <UpdaterBanner className={styles['updater-banner-container']} />
-                                    <RouterWithProtectedRoutes
-                                        className={styles['router']}
-                                        viewsConfig={routerViewsConfig}
-                                        onPathNotMatch={onPathNotMatch}
-                                    />
-                                </FullscreenProvider>
-                            </ShortcutsProvider>
-                        </GamepadProvider>
-                    </TooltipProvider>
-                </ToastProvider>
-            </PlatformProvider>
+            <ToastProvider className={styles['toasts-container']}>
+                <TooltipProvider className={styles['tooltip-container']}>
+                    <GamepadProvider enabled={gamepadSupportEnabled} onGuide={toggleGamepadModal}>
+                        <ShortcutsProvider onShortcut={onShortcut}>
+                            <FullscreenProvider>
+                                {
+                                    shortcutModalOpen && <ShortcutsModal onClose={closeShortcutsModal}/>
+                                }
+                                {
+                                    gamepadModalOpen && <GamepadModal onClose={closeGamepadModal}/>
+                                }
+                                <ServicesToaster />
+                                <DeepLinkHandler />
+                                <SearchParamsHandler />
+                                <UpdaterBanner className={styles['updater-banner-container']} />
+                                <RouterWithProtectedRoutes
+                                    className={styles['router']}
+                                    viewsConfig={routerViewsConfig}
+                                    onPathNotMatch={onPathNotMatch}
+                                />
+                            </FullscreenProvider>
+                        </ShortcutsProvider>
+                    </GamepadProvider>
+                </TooltipProvider>
+            </ToastProvider>
         </ServicesProvider>
     );
 };

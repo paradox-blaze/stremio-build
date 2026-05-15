@@ -3,7 +3,6 @@ type QtTransportMessage = {
 };
 
 interface QtTransport {
-    send: (message: string) => void,
     onmessage: (message: QtTransportMessage) => void,
 }
 
@@ -22,8 +21,8 @@ interface Chrome {
 }
 
 declare global {
-    var qt: Qt | undefined;
+    var qt: Qt;
     var chrome: Chrome | undefined;
 }
 
-export { };
+export {};

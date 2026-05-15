@@ -18,7 +18,7 @@ const { initReactI18next } = require('react-i18next');
 const stremioTranslations = require('stremio-translations');
 const App = require('./App');
 const { CoreProvider } = require('./core');
-const { FileDropProvider } = require('./common');
+const { FileDropProvider, PlatformProvider } = require('./common');
 
 const translations = Object.fromEntries(Object.entries(stremioTranslations()).map(([key, value]) => [key, {
     translation: value
@@ -42,11 +42,13 @@ const appInfo = {
 
 const root = ReactDOM.createRoot(document.getElementById('app'));
 root.render(
-    <CoreProvider appInfo={appInfo}>
-        <FileDropProvider>
-            <App />
-        </FileDropProvider>
-    </CoreProvider>
+    <PlatformProvider>
+        <CoreProvider appInfo={appInfo}>
+            <FileDropProvider>
+                <App />
+            </FileDropProvider>
+        </CoreProvider>
+    </PlatformProvider>
 );
 
 if (process.env.NODE_ENV === 'production' && process.env.SERVICE_WORKER_DISABLED !== 'true' && process.env.SERVICE_WORKER_DISABLED !== true && 'serviceWorker' in navigator) {

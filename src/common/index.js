@@ -22,7 +22,6 @@ const useNotifications = require('./useNotifications');
 const useOnScrollToBottom = require('./useOnScrollToBottom');
 const useProfile = require('./useProfile');
 const { default: useSettings } = require('./useSettings');
-const { default: useShell } = require('./useShell');
 const useStreamingServer = require('./useStreamingServer');
 const { default: useTimeout } = require('./useTimeout');
 const { default: usePlayUrl } = require('./usePlayUrl');
@@ -63,7 +62,6 @@ module.exports = {
     useOnScrollToBottom,
     useProfile,
     useSettings,
-    useShell,
     useStreamingServer,
     useTimeout,
     usePlayUrl,

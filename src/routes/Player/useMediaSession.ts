@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import { useShell } from 'stremio/common';
-import { MediaStatus } from 'stremio/common/useShell';
+import { usePlatform } from 'stremio/common';
 
 const useMediaSession = (
     videoState: VideoState,
@@ -10,7 +9,7 @@ const useMediaSession = (
     onPauseRequested: () => void,
     onNextVideoRequested: () => void,
 ) => {
-    const shell = useShell();
+    const { shell } = usePlatform();
 
     useEffect(() => {
         if (!('audioSession' in navigator)) return;

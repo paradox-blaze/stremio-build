@@ -10,7 +10,7 @@ const { useRouteFocused } = require('stremio-router');
 const { useCore } = require('stremio/core');
 const { useServices, useGamepad } = require('stremio/services');
 const { useContentGamepadNavigation } = require('stremio/services/GamepadNavigation');
-const { useSettings, useProfile, useFullscreen, useBinaryState, useToast, useStreamingServer, withCoreSuspender, useShell, usePlatform, onShortcut } = require('stremio/common');
+const { useSettings, useProfile, useFullscreen, useBinaryState, useToast, useStreamingServer, withCoreSuspender, usePlatform, onShortcut } = require('stremio/common');
 const { HorizontalNavBar, Transition, ContextMenu } = require('stremio/components');
 const BufferingLoader = require('./BufferingLoader');
 const VolumeChangeIndicator = require('./VolumeChangeIndicator');
@@ -42,7 +42,6 @@ const Player = ({ urlParams, queryParams }) => {
     const { t } = useTranslation();
     const services = useServices();
     const core = useCore();
-    const shell = useShell();
     const gamepad = useGamepad();
     const forceTranscoding = React.useMemo(() => {
         return queryParams.has('forceTranscoding');
@@ -424,7 +423,7 @@ const Player = ({ urlParams, queryParams }) => {
                 seriesInfo: player.seriesInfo,
             }, {
                 chromecastTransport: services.chromecast.active ? services.chromecast.transport : null,
-                shellTransport: services.shell.active ? services.shell.transport : null,
+                shellTransport: platform.shell.active ? platform.shell : null,
             });
         }
     }, [streamingServer.baseUrl, player.selected, player.stream, streamSubtitles, forceTranscoding, casting]);
@@ -536,10 +535,10 @@ const Player = ({ urlParams, queryParams }) => {
     }, []);
 
     React.useEffect(() => {
-        if (settings.pauseOnMinimize && (shell.windowClosed || shell.windowHidden)) {
+        if (settings.pauseOnMinimize && (platform.shell.state.windowClosed || platform.shell.state.windowHidden)) {
             onPauseRequested();
         }
-    }, [settings.pauseOnMinimize, shell.windowClosed, shell.windowHidden]);
+    }, [settings.pauseOnMinimize, platform.shell.state.windowClosed, platform.shell.state.windowHidden]);
 
     useMediaSession(video.state, player, fullscreen, onPlayRequested, onPauseRequested, onNextVideoRequested);
 
@@ -565,8 +564,8 @@ const Player = ({ urlParams, queryParams }) => {
                     break;
             }
         };
-        shell.on('media-key', onMediaKey);
-        return () => shell.off('media-key', onMediaKey);
+        platform.shell.on('media-key', onMediaKey);
+        return () => platform.shell.off('media-key', onMediaKey);
     }, [video.state.paused, player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested]);
 
     onShortcut('seekForward', (combo) => {
