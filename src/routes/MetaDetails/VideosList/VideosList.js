@@ -93,7 +93,8 @@ const VideosList = ({ className, metaItem, libraryItem, season, seasonOnSelect, 
             isMountedRef.current = true;
             return;
         }
-        if (videosContainerRef.current) {
+        const hasSelectedVideo = videosForSeason.some((v) => v.id === selectedVideoId);
+        if (!hasSelectedVideo && videosContainerRef.current) {
             videosContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }, [selectedSeason]);
