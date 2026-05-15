@@ -77,8 +77,8 @@ const useMediaSession = (
     // Callbacks
     useEffect(() => {
         if (navigator.mediaSession) {
-            navigator.mediaSession.setActionHandler('play', onPlayRequested);
-            navigator.mediaSession.setActionHandler('pause', onPauseRequested);
+            navigator.mediaSession.setActionHandler('play', videoState.paused === true ? onPlayRequested : null);
+            navigator.mediaSession.setActionHandler('pause', videoState.paused === false ? onPauseRequested : null);
         }
 
         const nexVideoCallback = player.nextVideo ? onNextVideoRequested : null;
@@ -96,9 +96,9 @@ const useMediaSession = (
             navigator.mediaSession.setActionHandler('play', null);
             navigator.mediaSession.setActionHandler('pause', null);
             navigator.mediaSession.setActionHandler('nexttrack', null);
-            shell.on('media.status', onMediaStatus);
+            shell.off('media.status', onMediaStatus);
         };
-    }, [player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested]);
+    }, [videoState.paused, player.nextVideo, onPlayRequested, onPauseRequested, onNextVideoRequested]);
 };
 
 export default useMediaSession;
