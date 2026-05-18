@@ -59,7 +59,7 @@ const useStatistics = (player, streamingServer) => {
             const minDownload = Math.min(8 * MB, Math.max(2 * MB, statistics.streamLen * 0.008));
             const downloadedScore = Math.min(1, statistics.downloaded / minDownload) * 70;
 
-            const speedCore = Math.min(1, statistics.downloadSpeed / (1 * MB)) * 10;
+            const speedScore = Math.min(1, statistics.downloadSpeed / (1 * MB)) * 10;
 
             return Math.min(99, peerScore + downloadedScore + speedCore);
         });
