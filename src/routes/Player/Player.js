@@ -12,7 +12,7 @@ const { useServices, useGamepad } = require('stremio/services');
 const { useContentGamepadNavigation } = require('stremio/services/GamepadNavigation');
 const { useSettings, useProfile, useFullscreen, useBinaryState, useToast, useStreamingServer, withCoreSuspender, usePlatform, onShortcut } = require('stremio/common');
 const { HorizontalNavBar, Transition, ContextMenu } = require('stremio/components');
-const BufferingLoader = require('./BufferingLoader');
+const { default: Buffering } = require('./Buffering');
 const VolumeChangeIndicator = require('./VolumeChangeIndicator');
 const Error = require('./Error');
 const ControlBar = require('./ControlBar');
@@ -792,10 +792,11 @@ const Player = ({ urlParams, queryParams }) => {
             }
             {
                 (video.state.buffering || !video.state.loaded) && !error ?
-                    <BufferingLoader
+                    <Buffering
                         ref={bufferingRef}
                         className={classnames(styles['layer'], styles['buffering-layer'])}
                         logo={player?.metaItem?.content?.logo}
+                        progress={statistics.progress}
                     />
                     :
                     null
