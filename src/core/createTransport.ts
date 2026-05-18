@@ -4,7 +4,7 @@ const worker = new Worker(`${process.env.COMMIT_HASH}/scripts/worker.js`);
 const bridge = new Bridge(window, worker);
 
 const createTransport = (): CoreTransport => {
-    const init = async (args: object): Promise<void> => {
+    const init = (args: object): Promise<void> => {
         return bridge.call(['init'], [args]);
     };
 

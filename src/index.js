@@ -42,13 +42,15 @@ const appInfo = {
 
 const root = ReactDOM.createRoot(document.getElementById('app'));
 root.render(
-    <PlatformProvider>
-        <CoreProvider appInfo={appInfo}>
-            <FileDropProvider>
-                <App />
-            </FileDropProvider>
-        </CoreProvider>
-    </PlatformProvider>
+    <React.StrictMode>
+        <PlatformProvider>
+            <CoreProvider appInfo={appInfo}>
+                <FileDropProvider>
+                    <App />
+                </FileDropProvider>
+            </CoreProvider>
+        </PlatformProvider>
+    </React.StrictMode>
 );
 
 if (process.env.NODE_ENV === 'production' && process.env.SERVICE_WORKER_DISABLED !== 'true' && process.env.SERVICE_WORKER_DISABLED !== true && 'serviceWorker' in navigator) {

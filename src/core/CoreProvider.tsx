@@ -3,13 +3,15 @@ import CoreContext from './CoreContext';
 import createTransport from './createTransport';
 import Error from './Error';
 
+const transport = createTransport();
+window.core = transport;
+
 type Props = {
     appInfo: object,
     children: React.ReactNode,
 };
 
 const Core = (props: Props) => {
-    const transport = createTransport();
     const [initialized, setInitialized] = useState(false);
     const [error, setError] = useState<Error | null>();
 
