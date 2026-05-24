@@ -107,3 +107,20 @@
         }
     }
 }
+
+/* Force posters to be large and prevent them from squishing */
+.meta-item {
+    flex: 0 0 auto !important; 
+    
+    /* Netflix banner size - adjust these if they are too big/small */
+    width: 220px !important;   
+    height: 330px !important;  
+    
+    /* Hover effect */
+    transition: transform 0.2s ease-in-out !important;
+}
+
+.meta-item:hover {
+    transform: scale(1.05) !important;
+    z-index: 10;
+}

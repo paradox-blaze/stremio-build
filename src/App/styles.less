@@ -1,4 +1,21 @@
 // Copyright (C) 2017-2024 Smart code 203358507
+/* Force Stremio's top search bar wrapper to be transparent */
+/* =========================================
+   NETFLIX FLOATING TOP BAR
+   ========================================= */
+:root {
+  /* The deep Netflix blacks */
+  --primary-background-color: #000000 !important;
+  --secondary-background-color: #141414 !important;
+  
+  /* The iconic Netflix red */
+  --primary-accent-color: #E50914 !important;
+  --secondary-accent-color: #B81D24 !important; /* Slightly darker for active states */
+  
+  /* Text colors to ensure readability on black */
+  --primary-foreground-color: #FFFFFF !important;
+  --secondary-foreground-color: #B3B3B3 !important;
+}
 
 @import (reference) '~stremio/common/screen-sizes.less';
 @import (reference) '~@stremio/stremio-colors/less/stremio-colors.less';
@@ -64,11 +81,11 @@
     --secondary-foreground-color: rgb(12, 11, 17, 1);
     --primary-accent-color: rgb(123, 91, 245);
     --secondary-accent-color: rgba(34, 179, 101, 1);
-    --tertiary-accent-color: rgba(246, 199, 0, 1);
+    --tertiary-accent-color: #8b0e0e;
     --quaternary-accent-color: rgba(18, 69, 166, 1);
     --overlay-color: rgba(255, 255, 255, 0.05);
-    --modal-background-color: rgba(15, 13, 32, 1);
-    --outer-glow: 0px 0px 15px rgba(123, 91, 245, 0.37);
+    --modal-background-color: rgba(0,0,0,0);
+    --outer-glow: 0px 0px 15px rgba(0,0,0,0);
     --warning-accent-color: rgba(255, 165, 0, 1);
     --danger-accent-color: rgba(220, 38, 38, 1);  
     --border-radius: 0.75rem;
@@ -273,4 +290,70 @@ html {
     :root {
         --bottom-overlay-size: 6rem;
     }
+}
+
+/* =========================================
+   SIDEBAR NAVIGATION (Netflix Style)
+   ========================================= */
+
+/* 1. Make the main sidebar background dark grey */
+[class^="nav-menu-container"] {
+     background-color: var(--secondary-background-color) !important; /* Uses the #141414 we set earlier */
+     border-right: 1px solid #222 !important; /* Optional: adds a subtle dark border to separate it from the main view */
+ }
+ 
+ /* 2. Change the hover background to a subtle dark color instead of purple */
+[class^="nav-menu-option-container"]:hover,
+[class^="nav-menu-option-container"]:focus {
+     background-color: #1a1a1a !important; 
+     color: var(--primary-accent-color) !important; /* Text turns Red */
+ }
+ 
+ /* 3. Make the SVG icons turn Red when hovered */
+[class^="nav-menu-option-container"]:hover svg {
+     /* Some Stremio icons use stroke, some use fill. We target both to be safe. */
+     stroke: var(--primary-accent-color) !important;
+     fill: var(--primary-accent-color) !important;
+ }
+ 
+ /* 4. Style the "Log in / Sign up" button to look like a Netflix button */
+/* 4. Style the "Log in / Sign up" button to be transparent */
+[class^="logout-button-container"] {
+    background-color: transparent !important;
+    color: var(--primary-foreground-color) !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+[class^="logout-button-container"]:hover {
+    /* Just a subtle text color change on hover, no background box */
+    background-color: transparent !important; 
+    color: var(--primary-accent-color) !important; 
+}
+/* =========================================
+   NETFLIX FLOATING TOP BAR
+   ========================================= */
+[class^="topbar-container"] {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    
+    /* Make it transparent */
+    background-color: transparent !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    
+    /* Keep it clickable above the movie banner */
+    z-index: 100 !important; 
+    
+    /* Optional: Add a subtle gradient behind JUST the search bar so it's always readable */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%) !important;
+}
+
+/* Because the Topbar is floating, we need to push the content of OTHER pages down 
+   so they don't get covered up. The Board will ignore this later. */
+[class^="main-container"] {
+    padding-top: 4rem !important; 
 }
