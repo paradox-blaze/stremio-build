@@ -170,22 +170,18 @@ const Discover = ({ urlParams, queryParams }) => {
                                     </div>
                                     :
                                     <div ref={metasContainerRef} className={classnames(styles['meta-items-container'], 'animation-fade-in')} onScroll={onScroll} onFocusCapture={metaItemsOnFocusCapture}>
-                                        {discover.catalog.content.content.map((metaItem, index) => (
-                                            <MetaItem
-                                                key={index}
-                                                className={classnames({ 'selected': selectedMetaItemIndex === index })}
-                                                type={metaItem.type}
-                                                name={metaItem.name}
-                                                poster={metaItem.poster}
-                                                posterShape={metaItem.posterShape}
-                                                playname={selectedMetaItemIndex === index}
-                                                deepLinks={metaItem.deepLinks}
-                                                watched={metaItem.watched}
-                                                data-index={index}
-                                                onClick={metaItemOnClick}
-                                            />
-                                        ))}
-                                    </div>
+    {discover.catalog.content.content.map((metaItem, index) => (
+        <MetaItem
+            key={index}
+            className={classnames({ 'selected': selectedMetaItemIndex === index })}
+            /* THE INSIGHT FIX: Pass the full catalog object down so our hovercard has IDs, descriptions, and backgrounds! */
+            item={metaItem} 
+            playname={selectedMetaItemIndex === index}
+            data-index={index}
+            onClick={metaItemOnClick}
+        />
+    ))}
+</div>
                     }
                 </div>
                 {
