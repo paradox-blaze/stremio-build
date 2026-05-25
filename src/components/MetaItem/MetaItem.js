@@ -42,19 +42,53 @@ const MetaItem = (props) => {
         return payload.inLibrary === true || !!payload.state || !!payload._id;
     });
 
-    // Derive watched state directly from props — localStorage is NOT used as source of truth.
-    // When the list re-sorts/re-filters, React reuses component instances at the same DOM position
-    // with entirely new props. If we seeded from localStorage[oldId], the stale "watched" badge
-    // would render on the wrong poster. The core already owns this state; trust it.
     const watchedFromProps = payload.watched === true ||
         (payload.state && (payload.state.isWatched === true || payload.state.watched === true)) ||
         false;
     const [localWatched, setLocalWatched] = React.useState(watchedFromProps);
 
-    // Re-sync whenever the underlying item swaps in (same component instance, different safeId)
     React.useEffect(() => {
         setLocalWatched(watchedFromProps);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [safeId]);
+
+    const syncWatchedFromCore = React.useCallback(() => {
+        if (!safeId || !core?.transport?.getState) return;
+        try {
+            const libState = core.transport.getState('library');
+            // Check both 'items' and 'catalog' to ensure we catch the Rust payload
+            const libItems = libState?.items || libState?.catalog;
+            if (!Array.isArray(libItems)) return;
+            
+            const libEntry = libItems.find((i) => i.id === safeId || i._id === safeId);
+            if (libEntry !== undefined) {
+                const coreWatched =
+                    libEntry.state?.watched === true ||
+                    libEntry.state?.isWatched === true ||
+                    libEntry.watched === true ||
+                    false;
+                setLocalWatched(coreWatched);
+            }
+        } catch (_) {
+            // getState can throw if the model isn't loaded; silently ignore
+        }
+    }, [safeId, core]);
+
+    // Pull once on mount so Board cards reflect whatever the library already knows.
+    React.useEffect(() => {
+        syncWatchedFromCore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [safeId]);
+
+    // Listen for changes made by other MetaItem instances across the app (The Event Bridge)
+    React.useEffect(() => {
+        const handleCrossAppSync = (e) => {
+            if (e.detail && e.detail.id === safeId) {
+                setLocalWatched(e.detail.watched);
+            }
+        };
+        window.addEventListener('stremio_watched_sync', handleCrossAppSync);
+        return () => window.removeEventListener('stremio_watched_sync', handleCrossAppSync);
     }, [safeId]);
 
     const getGlobalMute = () => {
@@ -96,7 +130,7 @@ const MetaItem = (props) => {
     }, [isHovered, safeId, type, extendedMeta]);
 
     // ==========================================
-    // 2. DATA PREP & THE RUST PAYLOAD FIX
+    // 2. DATA PREP
     // ==========================================
 
     const isContinueWatching = isCWRow === true;
@@ -104,8 +138,6 @@ const MetaItem = (props) => {
     const displayDesc = description || extendedMeta?.description || "Explore this title to see more details.";
     const displayBg = background || extendedMeta?.background || poster;
 
-    // THE MAGIC BULLET: We spread the original payload (keeping all hidden fields like behaviorHints) 
-    // but force the explicit 'id' property so the Rust deserializer never crashes!
     const rustSafePayload = {
         ...payload,
         id: safeId
@@ -168,12 +200,17 @@ const MetaItem = (props) => {
         } catch (err) { console.error('Library sync failed:', err); }
     };
 
-    // THE NATIVE WATCHED ACTION — optimistic local update + dispatch to core.
-    // No localStorage write: the core is the single source of truth for watched state.
+    // THE NATIVE WATCHED ACTION — optimistic local update + dispatch to core + Event Broadcast.
     const toggleWatched = (e) => {
         e.preventDefault(); e.stopPropagation();
         const newState = !localWatched;
+        
         setLocalWatched(newState); // optimistic UI update
+        
+        // Broadcast this state change to all other mounted MetaItems
+        window.dispatchEvent(new CustomEvent('stremio_watched_sync', { 
+            detail: { id: safeId, watched: newState } 
+        }));
         
         try {
             core.transport.dispatch({ 
@@ -183,10 +220,11 @@ const MetaItem = (props) => {
                     args: { meta_item: rustSafePayload, is_watched: newState } 
                 } 
             });
+            // Re-read from the library model after a short delay
+            setTimeout(syncWatchedFromCore, 300);
         } catch (err) { console.error('Watched sync failed:', err); }
     };
 
-    // THE REWIND FIX (Direct from your OG Code)
     const handleDismiss = (e) => {
         e.preventDefault(); e.stopPropagation();
         
