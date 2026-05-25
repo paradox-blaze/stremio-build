@@ -200,3 +200,69 @@
         }
     }
 }
+
+
+/* Netflix Action Row UI */
+.hover-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Allow the play button to take up most of the space */
+.hover-play-btn {
+    flex-grow: 1;
+    justify-content: center;
+    margin-bottom: 0 !important; /* Overrides your previous bottom margin */
+}
+
+/* The Circular Action Buttons (+, Eye, Check) */
+.circle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(42, 42, 42, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.circle-btn:hover {
+    border-color: white;
+    background-color: white;
+    color: black; /* Reverses out nicely just like Netflix */
+    transform: scale(1.1);
+}
+
+.circle-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* The Watched Badge overlay for the poster */
+.watched-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background-color: #e50914; /* Netflix Red */
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+    z-index: 10;
+}
+
+.watched-badge svg {
+    width: 14px;
+    height: 14px;
+}

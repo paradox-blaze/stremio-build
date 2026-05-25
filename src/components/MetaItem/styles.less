@@ -605,4 +605,266 @@
     height: 22px;
 }
 
+/* Netflix Action Row UI */
+.hover-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
 
+/* Allow the play button to take up most of the space */
+.hover-play-btn {
+    flex-grow: 1;
+    justify-content: center;
+    margin-bottom: 0 !important; /* Overrides your previous bottom margin */
+}
+
+/* The Circular Action Buttons (+, Eye, Check) */
+.circle-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(42, 42, 42, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.circle-btn:hover {
+    border-color: white;
+    background-color: white;
+    color: black; /* Reverses out nicely just like Netflix */
+    transform: scale(1.1);
+}
+
+.circle-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* The Watched Badge overlay for the poster */
+.watched-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background-color: #e50914; /* Netflix Red */
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+    z-index: 10;
+}
+
+.watched-badge svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* The Dismiss 'X' Button for Continue Watching */
+.dismiss-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    background-color: rgba(20, 20, 20, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 15;
+    opacity: 0; /* Hidden by default */
+    transition: all 0.2s ease;
+}
+
+/* Only show the 'X' when hovering over the poster */
+.netflix-card-wrapper:hover .dismiss-btn {
+    opacity: 1;
+}
+
+.dismiss-btn:hover {
+    background-color: white;
+    color: black;
+    transform: scale(1.1);
+}
+
+.dismiss-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* If a poster has BOTH a Watched Badge AND a Dismiss Button, push the Dismiss button to the left */
+.watched-badge + .dismiss-btn {
+    right: 36px;
+}
+
+
+/* =========================================
+   LIKE & LOVE HOVER MENU
+   ========================================= */
+
+.like-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* The hidden pop-up pill */
+.like-popup {
+    position: absolute;
+    bottom: 120%; /* Pushes it above the main button */
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    display: flex;
+    gap: 8px;
+    background: rgba(30, 30, 30, 0.95);
+    padding: 6px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 20;
+}
+
+/* Reveal the pop-up when hovering over the container */
+.like-container:hover .like-popup {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Ensure the pop-up buttons match the Netflix style */
+.like-popup .circle-btn {
+    width: 34px;
+    height: 34px;
+    background-color: transparent;
+    border: none;
+}
+
+.like-popup .circle-btn:hover {
+    background-color: white;
+    color: black;
+}
+
+
+/* =========================================
+   NETFLIX HOVER ACTIONS & BADGES
+   ========================================= */
+
+.hover-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Slightly tighter gap to fit 4 buttons nicely */
+    margin-bottom: 15px;
+}
+
+.hover-play-btn {
+    flex-grow: 1;
+    justify-content: center;
+    margin-bottom: 0 !important; 
+}
+
+/* The Circular Action Buttons */
+.circle-btn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px; /* Prevents flexbox squishing */
+    min-height: 36px;
+    border-radius: 50%;
+    background-color: rgba(42, 42, 42, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    box-sizing: border-box; 
+}
+
+.circle-btn:hover {
+    border-color: white;
+    background-color: white;
+    color: black; 
+    transform: scale(1.1);
+}
+
+/* THE ANTI-SHAKE FIX */
+.circle-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+    display: block;
+}
+
+.watched-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background-color: #e50914; 
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+    z-index: 10;
+}
+
+.watched-badge svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* =========================================
+   THE "X" DISMISS BUTTON 
+   ========================================= */
+.dismiss-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    background-color: rgba(20, 20, 20, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 15;
+    opacity: 0; 
+    transition: all 0.2s ease;
+}
+
+.dismiss-btn:hover {
+    background-color: white;
+    color: black;
+    transform: scale(1.1);
+}
+
+.dismiss-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.netflix-card-wrapper:hover .dismiss-btn {
+    opacity: 1;
+}

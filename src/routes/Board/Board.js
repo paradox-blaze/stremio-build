@@ -414,16 +414,17 @@ const Board = () => {
                 <div ref={scrollContainerRef} className={styles['board-content']} onScroll={onScroll}>
                     <HeroBanner catalogs={board.catalogs} scrollContainerRef={scrollContainerRef}/>
                     {
-                        continueWatchingPreview.items.length > 0 ?
-                            <MetaRow
-                                className={classnames(styles['board-row'], styles['continue-watching-row'], 'animation-fade-in')}
-                                title={t.string('BOARD_CONTINUE_WATCHING')}
-                                catalog={continueWatchingPreview}
-                                itemComponent={MetaItem}
-                                notifications={notifications}
-                            />
-                            :
-                            null
+        continueWatchingPreview.items.length > 0 ?
+            <MetaRow
+                className={classnames(styles['board-row'], styles['continue-watching-row'], 'animation-fade-in')}
+                title={t.string('BOARD_CONTINUE_WATCHING')}
+                catalog={continueWatchingPreview}
+                /* THIS FLAG ENSURES THE 'X' BUTTON APPEARS ONLY HERE */
+                itemComponent={(props) => <MetaItem {...props} isCWRow={true} />} 
+                notifications={notifications}
+            />
+            :
+            null
                     }
                     {board.catalogs.map((catalog, index) => {
                         switch (catalog.content?.type) {
@@ -433,7 +434,7 @@ const Board = () => {
                                         key={index}
                                         className={classnames(styles['board-row'], styles[`board-row-${catalog.content.content[0].posterShape}`], 'animation-fade-in')}
                                         catalog={catalog}
-                                        itemComponent={NetflixHoverCard}
+                                        itemComponent={MetaItem}
                                     />
                                 );
                             }

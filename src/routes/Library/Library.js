@@ -6,7 +6,7 @@ const PropTypes = require('prop-types');
 const classnames = require('classnames');
 const NotFound = require('stremio/routes/NotFound');
 const { useProfile, useNotifications, routesRegexp, useOnScrollToBottom, withCoreSuspender } = require('stremio/common');
-const { DelayedRenderer, Chips, Image, MainNavBars, LibItem, MultiselectMenu } = require('stremio/components');
+const { DelayedRenderer, Chips, Image, MainNavBars, MetaItem, MultiselectMenu } = require('stremio/components');
 const { default: Placeholder } = require('./Placeholder');
 const useLibrary = require('./useLibrary');
 const useSelectableInputs = require('./useSelectableInputs');
@@ -102,10 +102,10 @@ const Library = ({ model, urlParams, queryParams }) => {
                                         <div className={styles['message-label']}>{model === 'library' ? t('LIBRARY_EMPTY') : t('BOARD_CONTINUE_WATCHING_EMPTY')}</div>
                                     </div>
                                     :
-                                    <div ref={scrollContainerRef} className={classnames(styles['meta-items-container'], 'animation-fade-in')} onScroll={onScroll}>
+                        <div ref={scrollContainerRef} className={classnames(styles['meta-items-container'], 'animation-fade-in')} onScroll={onScroll}>
                                         {
                                             library.catalog.map((libItem, index) => (
-                                                <LibItem {...libItem} notifications={notifications} removable={model === 'library'} key={index} />
+                                                <MetaItem item={libItem} notifications={notifications} key={index} />
                                             ))
                                         }
                                     </div>
