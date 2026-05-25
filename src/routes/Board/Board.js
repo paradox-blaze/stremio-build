@@ -25,6 +25,10 @@ if (typeof window !== 'undefined') {
 
 const THRESHOLD = 5;
 
+// THE REACT FIX: We define this outside the Board component. 
+// This keeps the reference stable so React stops destroying and rebuilding the CW cards on every click.
+const ContinueWatchingMetaItem = (props) => <MetaItem {...props} isCWRow={true} />;
+
 const HeroBanner = ({ catalogs }) => {
     const [currentIndex, setCurrentIndex] = React.useState(0);
     const [heroItems, setHeroItems] = React.useState([]);
@@ -249,8 +253,8 @@ const Board = () => {
                 className={classnames(styles['board-row'], styles['continue-watching-row'], 'animation-fade-in')}
                 title={t.string('BOARD_CONTINUE_WATCHING')}
                 catalog={continueWatchingPreview}
-                /* THIS FLAG ENSURES THE 'X' BUTTON APPEARS ONLY HERE */
-                itemComponent={(props) => <MetaItem {...props} isCWRow={true} />} 
+                /* UPDATED: Now uses the stable reference we defined at the top */
+                itemComponent={ContinueWatchingMetaItem} 
                 notifications={notifications}
             />
             :
