@@ -235,92 +235,71 @@
 /* =========================================
    NETFLIX HERO BANNER
    ========================================= */
+/* =========================================
+   NETFLIX HERO BANNER
+   ========================================= */
 
-/* The Container: Acts as a physical spacer to push the movie rows down */
-/* 1. The Container: Fits cleanly inside Stremio's native layout */
 .netflix-hero-container {
     position: relative;
-    width: 100%; 
-    margin-bottom: 2rem; 
     
-    height: 60vh; 
-    min-height: 450px;
-    max-height: 700px;
+    /* 1. BLEED INTO TOP NAVBAR */
+    width: calc(100% + 2rem);
+    margin-left: -1rem;
+    margin-right: -1rem;
+    margin-top: -1rem; /* Drags the banner up under the search bar */
+    margin-bottom: 2rem;
     
-    z-index: 1;
-    overflow: hidden; 
-    
-    /* Optional: Softens the corners since it sits inside the content box */
-    border-radius: 12px; 
+    height: 75vh; 
+    min-height: 500px;
+    max-height: 800px;
+    background-color: #000;
+    overflow: hidden;
 }
 
-/* 2. The Background Image: Native absolute positioning */
 .netflix-hero-slide {
-    position: absolute; 
+    position: absolute;
     top: 0;
     left: 0;
-    
-    width: 100%; 
-    height: 100%; 
-    
+    width: 100%;
+    height: 100%;
     background-size: cover;
-    background-position: center 20%;
+    background-position: center top;
     opacity: 0;
     transition: opacity 1s ease-in-out; 
-    z-index: -1; 
-    pointer-events: none; 
+    z-index: 1;
 }
 
 .netflix-hero-slide.active {
     opacity: 1;
+    z-index: 2;
 }
 
-/* The Gradients: Applied directly over the fixed background */
 .netflix-hero-vignette {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    
+    /* 2. THREE-WAY GRADIENT (Bottom, Left, and Top) */
     background: 
-        linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 15%, rgba(0,0,0,0) 45%),
-        linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 15%, rgba(0,0,0,0) 55%),
-        linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 20%);
-}
-
-/* NEW: The Text Wrapper: Positioned absolute so it scrolls naturally! */
-.netflix-hero-content-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    
+        /* Fade to black at bottom */
+        linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 45%),
+        /* Fade to black on left for text */
+        linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 55%),
+        /* NEW: Fade to black at top so the search bar is readable */
+        linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 20%);
+        
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end; 
-    
-    /* ELEVATE IT: Pushes the text higher up towards the center */
-    padding-bottom: 12%; 
-    padding-left: 2rem;   
-    
-    opacity: 0;
-    transition: opacity 1s ease-in-out;
-    pointer-events: none; 
+    align-items: flex-end;
 }
 
-.netflix-hero-content-wrapper.active {
-    opacity: 1;
-    pointer-events: auto; 
-}
-
-/* The Layout for the Text and Button */
 .netflix-hero-content {
-    /* STRETCH IT: Allows the text to stretch almost to the right edge */
-    max-width: 85%; 
+    padding: 40px 4rem; 
+    max-width: 90%; /* Widened to fit side-by-side elements */
     display: flex;
     flex-direction: column;
-    gap: 15px; 
+    gap: 20px; 
 }
 
 .netflix-hero-logo {
@@ -339,11 +318,12 @@
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
+/* 3. NEW ACTION ROW LAYOUT */
 .netflix-hero-action-row {
     display: flex;
     flex-direction: row;
-    align-items: center; 
-    gap: 25px; 
+    align-items: center; /* Vertically centers the button and text */
+    gap: 25px; /* Space between button and text */
 }
 
 .netflix-btn-info {
@@ -358,7 +338,7 @@
     font-weight: 600;
     text-decoration: none;
     transition: background-color 0.2s ease-in-out;
-    flex-shrink: 0; 
+    flex-shrink: 0; /* Prevents the button from getting squished by long text */
 }
 
 .netflix-btn-info:hover {
@@ -369,15 +349,15 @@
     fill: #ffffff;
 }
 
+/* 4. STRIPPED DESCRIPTION */
 .netflix-hero-description {
     color: #e5e5e5;
-    
-    /* BUMP FONT SIZE: Makes it more readable and naturally limits word count */
-    font-size: 1.35rem; 
-    line-height: 1.5;
+    font-size: 1.5rem;
+    line-height: 1.4;
     margin: 0;
-    text-shadow: 2px 2px 5px rgba(0,0,0,1);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.9); /* Stronger shadow to pop against the image */
     
+    /* Clamp text to exactly 3 lines */
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;

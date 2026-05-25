@@ -12,19 +12,19 @@ const styles = require('./styles');
 const { default: StreamingServerWarning } = require('./StreamingServerWarning');
 
 const THRESHOLD = 5;
-const HeroBanner = ({ catalogs, scrollContainerRef }) => {
+
+const HeroBanner = ({ catalogs }) => {
     const [currentIndex, setCurrentIndex] = React.useState(0);
     const [heroItems, setHeroItems] = React.useState([]);
-    const bgRef = React.useRef(null);
 
     React.useEffect(() => {
-        // Changed to v3 to force-clear the old Cinemeta cache!
-        const cachedData = localStorage.getItem('netflix_hero_cache_v4');
+        // Changed cache key to 'v2' to force-clear your old movies!
+        const cachedData = localStorage.getItem('netflix_hero_cache_v2');
         if (cachedData) {
             try {
                 const parsed = JSON.parse(cachedData);
                 const now = new Date().getTime();
-                if (now - parsed.timestamp < 3600000 && parsed.items && parsed.items.length > 0) {
+                if (now - parsed.timestamp < 86400000 && parsed.items && parsed.items.length > 0) {
                     setHeroItems(parsed.items);
                     return; 
                 }
@@ -33,49 +33,46 @@ const HeroBanner = ({ catalogs, scrollContainerRef }) => {
             }
         }
 
-        let watchlyPool = [];
         let customAddonPool = [];
         let cinemetaPool = [];
 
         catalogs.forEach(cat => {
             const catItems = cat?.content?.content || cat?.items || [];
             
-            // RELAXED FILTER: We no longer require a description, only a background image!
+            // Only accept items with a background, a description, and that are movies/series
             const validItems = catItems.filter(i => 
-                i.background && (i.type === 'movie' || i.type === 'series')
+                i.background && 
+                i.description && 
+                (i.type === 'movie' || i.type === 'series')
             );
             
-            const catId = (cat.id || '').toLowerCase();
-            const manifestId = (cat.addon?.manifest?.id || '').toLowerCase();
-            const manifestName = (cat.addon?.manifest?.name || '').toLowerCase();
+            // Check if this catalog is from Stremio's default Cinemeta
+            const isCinemeta = cat.id?.includes('cinemeta') || cat.addon?.manifest?.id?.includes('cinemeta');
             
-            // Identify where the catalog came from
-            const isCinemeta = catId.includes('cinemeta') || manifestId.includes('cinemeta');
-            const isWatchly = catId.includes('watchly') || manifestId.includes('watchly') || manifestName.includes('watchly');
-            
-            if (isWatchly) {
-                watchlyPool = [...watchlyPool, ...validItems];
-            } else if (isCinemeta) {
+            if (isCinemeta) {
                 cinemetaPool = [...cinemetaPool, ...validItems];
             } else {
+                // This is a 3rd party addon like Watchly, TMDB, Trakt, etc.
                 customAddonPool = [...customAddonPool, ...validItems];
             }
         });
 
-        // Shuffle each pool independently
-        watchlyPool = watchlyPool.sort(() => 0.5 - Math.random());
-        customAddonPool = customAddonPool.sort(() => 0.5 - Math.random());
-        cinemetaPool = cinemetaPool.sort(() => 0.5 - Math.random());
+        // Prioritize custom addons first, then Cinemeta. Shuffle both pools independently.
+        let mixedPool = [
+            ...customAddonPool.sort(() => 0.5 - Math.random()), 
+            ...cinemetaPool.sort(() => 0.5 - Math.random())
+        ];
 
-        // FORCE Watchly to the absolute front of the line, followed by other addons, then Cinemeta last
-        let mixedPool = [...watchlyPool, ...customAddonPool, ...cinemetaPool];
-
+        // Remove duplicates just in case
         const uniqueItems = Array.from(new Map(mixedPool.map(item => [item.id, item])).values());
 
         if (uniqueItems.length >= 5) {
-            const selected = uniqueItems.slice(0, 5);
+            // Take the top 15 from our prioritized list, shuffle them, and lock in 5
+            const topCandidates = uniqueItems.slice(0, 15).sort(() => 0.5 - Math.random());
+            const selected = topCandidates.slice(0, 5);
             setHeroItems(selected);
-            localStorage.setItem('netflix_hero_cache_v3', JSON.stringify({
+
+            localStorage.setItem('netflix_hero_cache_v2', JSON.stringify({
                 timestamp: new Date().getTime(),
                 items: selected
             }));
@@ -88,66 +85,34 @@ const HeroBanner = ({ catalogs, scrollContainerRef }) => {
         if (heroItems.length <= 1) return;
         const interval = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % heroItems.length);
-        }, 7000);
+        }, 7000); // Bumped to 7 seconds so you have time to read descriptions
         return () => clearInterval(interval);
     }, [heroItems.length]);
 
-   React.useEffect(() => {
-        const container = scrollContainerRef?.current;
-        if (!container) return;
-
-        const syncScroll = () => {
-            if (bgRef.current) {
-                bgRef.current.style.transform = `translateY(-${container.scrollTop}px)`;
-            }
-        };
-
-        // 1. Fire instantly when you navigate back to the page
-        syncScroll();
-        
-        // 2. Catch the browser's native "Scroll Restoration" a split-second later
-        const fallbackSync = setTimeout(syncScroll, 50);
-
-        // 3. Listen for normal active scrolling
-        container.addEventListener('scroll', syncScroll, { passive: true });
-        
-        return () => {
-            container.removeEventListener('scroll', syncScroll);
-            clearTimeout(fallbackSync);
-        };
-    }, [scrollContainerRef]);
-
-        React.useEffect(() => {
-        const container = scrollContainerRef?.current;
-        if (container && bgRef.current) {
-            bgRef.current.style.transform = `translateY(-${container.scrollTop}px)`;
-        }
-    }, [currentIndex, scrollContainerRef]);
     if (heroItems.length === 0) return null;
 
-    return (
+return (
         <div className={styles['netflix-hero-container']}>
             {heroItems.map((item, index) => {
-                const isActive = index === currentIndex;
                 const detailHref = item.deepLinks?.metaDetails || `#/detail/${item.type}/${item.id}`;
-                
-                // Fallback text just in case Watchly didn't provide a description
-                const displayDescription = item.description || `Explore this trending ${item.type} and discover why it is captivating audiences right now.`;
 
                 return (
-                    <React.Fragment key={item.id}>
-                        <div 
-                            ref={isActive ? bgRef : null}
-                            className={classnames(styles['netflix-hero-slide'], { [styles['active']]: isActive })}
-                            style={{ backgroundImage: `url(${item.background})` }}
-                        >
-                            <div className={styles['netflix-hero-vignette']} />
-                        </div>
-
-                        <div className={classnames(styles['netflix-hero-content-wrapper'], { [styles['active']]: isActive })}>
+                    <div 
+                        key={item.id} 
+                        className={classnames(styles['netflix-hero-slide'], { [styles['active']]: index === currentIndex })}
+                        style={{ backgroundImage: `url(${item.background})` }}
+                    >
+                        {/* The Vignette Overlay */}
+                        <div className={styles['netflix-hero-vignette']}>
                             <div className={styles['netflix-hero-content']}>
-                                <h1>{item.name}</h1>
                                 
+                                {item.logo ? (
+                                    <img src={item.logo} alt={item.name} className={styles['netflix-hero-logo']} />
+                                ) : (
+                                    <h1>{item.name}</h1>
+                                )}
+                                
+                                {/* NEW: Action Row holding Button and Description side-by-side */}
                                 <div className={styles['netflix-hero-action-row']}>
                                     <a href={detailHref} className={styles['netflix-btn-info']}>
                                         <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
@@ -155,13 +120,15 @@ const HeroBanner = ({ catalogs, scrollContainerRef }) => {
                                         </svg>
                                         More Info
                                     </a>
+                                    
                                     <p className={styles['netflix-hero-description']}>
-                                        {displayDescription}
+                                        {item.description}
                                     </p>
                                 </div>
+
                             </div>
                         </div>
-                    </React.Fragment>
+                    </div>
                 );
             })}
         </div>
