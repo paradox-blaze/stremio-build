@@ -32,8 +32,10 @@ const MetaItem = (props) => {
     if (typeof coreLink === 'string' && coreLink.includes('undefined')) coreLink = null;
     const detailHref = coreLink || (safeId ? `#/detail/${type || 'movie'}/${safeId}` : '#');
 
-    // --- DECOUPLED OPTIMISTIC STATE ---
-    // We lock the state locally so it never "reverts" a millisecond after you click it.
+    // ==========================================
+    // 1. ALL HOOKS GO FIRST (Fixes the sorting error)
+    // ==========================================
+    
     const [localLibrary, setLocalLibrary] = React.useState(() => {
         const stored = localStorage.getItem(`stremio_lib_${safeId}`);
         if (stored !== null) return stored === 'true';
@@ -45,17 +47,6 @@ const MetaItem = (props) => {
         if (stored !== null) return stored === 'true';
         return payload.watched || (payload.state && payload.state.isWatched) || (payload.state && payload.state.watched) || false;
     });
-
-    const [localRating, setLocalRating] = React.useState(() => {
-        const stored = localStorage.getItem(`stremio_rating_${safeId}`);
-        return stored !== null ? stored : (payload.like || 'none');
-    });
-
-    const isContinueWatching = isCWRow === true;
-
-    if (!poster) {
-        return <div className={classnames('meta-item', styles['netflix-card-wrapper'], className)} style={{ backgroundColor: '#141414' }} {...domProps} />;
-    }
 
     const getGlobalMute = () => {
         if (!userHasInteracted) return true; 
@@ -95,9 +86,24 @@ const MetaItem = (props) => {
         }
     }, [isHovered, safeId, type, extendedMeta]);
 
+    // ==========================================
+    // 2. DATA PREP & SANITIZATION
+    // ==========================================
+
+    const isContinueWatching = isCWRow === true;
     const finalTrailerId = initialTrailerId || dynamicTrailer;
     const displayDesc = description || extendedMeta?.description || "Explore this title to see more details.";
     const displayBg = background || extendedMeta?.background || poster;
+
+    // THE SERIALIZATION CRASH FIX: Hardcast everything to primitive strings
+    const safePayload = {
+        id: String(safeId),
+        type: String(type || 'movie'),
+        name: String(name || ''),
+        poster: String(poster || ''),
+        background: String(displayBg || ''),
+        posterShape: String(posterShape || 'poster')
+    };
 
     const calculatePosition = () => {
         if (!cardRef.current) return { top: 0, left: 0 };
@@ -109,6 +115,10 @@ const MetaItem = (props) => {
         if (targetLeft + 450 > window.innerWidth - padding) targetLeft = window.innerWidth - 450 - padding;
         return { top: targetTop, left: targetLeft };
     };
+
+    // ==========================================
+    // 3. EVENT HANDLERS
+    // ==========================================
 
     const handleMouseEnter = () => {
         hoverTimer.current = setTimeout(() => {
@@ -135,30 +145,21 @@ const MetaItem = (props) => {
         }
     };
 
-    // --- INSTANT ACTION HANDLERS ---
-const safePayload = {
-        id: safeId,
-        type: type || 'movie',
-        name: name || '',
-        poster: poster || '',
-        background: displayBg || '',
-        posterShape: posterShape || 'poster'
-    };
-
-    // --- INSTANT ACTION HANDLERS ---
-const toggleLibrary = (e) => {
+    const toggleLibrary = (e) => {
         e.preventDefault(); e.stopPropagation();
         const newState = !localLibrary;
         setLocalLibrary(newState);
         localStorage.setItem(`stremio_lib_${safeId}`, newState.toString());
         
-        core.transport.dispatch({ 
-            action: 'Ctx', 
-            args: { 
-                action: newState ? 'AddToLibrary' : 'RemoveFromLibrary', 
-                args: newState ? { id: safeId, type: type } : safeId 
-            } 
-        });
+        try {
+            core.transport.dispatch({ 
+                action: 'Ctx', 
+                args: { 
+                    action: newState ? 'AddToLibrary' : 'RemoveFromLibrary', 
+                    args: newState ? safePayload : String(safeId) 
+                } 
+            });
+        } catch (err) { console.error('Library sync failed:', err); }
     };
 
     const toggleWatched = (e) => {
@@ -167,32 +168,33 @@ const toggleLibrary = (e) => {
         setLocalWatched(newState); 
         localStorage.setItem(`stremio_watched_${safeId}`, newState.toString());
         
-        core.transport.dispatch({ 
-            action: 'Ctx', 
-            args: { 
-                action: 'MetaItemMarkAsWatched', 
-                args: { meta_item: { id: safeId, type: type }, is_watched: newState } 
-            } 
-        });
+        try {
+            core.transport.dispatch({ 
+                action: 'Ctx', 
+                args: { 
+                    action: 'MetaItemMarkAsWatched', 
+                    args: { meta_item: safePayload, is_watched: newState } 
+                } 
+            });
+        } catch (err) { console.error('Watched sync failed:', err); }
     };
 
-const handleDismiss = (e) => {
-    e.preventDefault(); e.stopPropagation();
+    const handleDismiss = (e) => {
+        e.preventDefault(); e.stopPropagation();
+        
+        try {
+            // YOUR FIX: Resets playback progress, effectively dropping it from CW!
+            core.transport.dispatch({
+                action: 'Ctx',
+                args: {
+                    action: 'RewindLibraryItem', 
+                    args: String(safeId)
+                }
+            });
+        } catch (err) { console.error('Dismiss failed:', err); }
 
-    try {
-        core.transport.dispatch({
-            action: 'Ctx',
-            args: {
-                action: 'RewindLibraryItem', // ← clears progress, stays in library
-                args: safeId
-            }
-        });
-    } catch (err) {
-        console.error('Dismiss failed:', err);
-    }
-
-    if (cardRef.current) cardRef.current.style.display = 'none';
-};
+        if (cardRef.current) cardRef.current.style.display = 'none';
+    };
 
     const handlePlayNowClick = (e) => {
         e.preventDefault(); e.stopPropagation(); 
@@ -204,7 +206,16 @@ const handleDismiss = (e) => {
         if (domProps.onClick) domProps.onClick(e);
     };
 
-const hoverModal = isHovered ? ReactDOM.createPortal(
+    // ==========================================
+    // 4. RENDER UI
+    // ==========================================
+
+    // EARLY RETURN SAFEGUARD: Must be below all hooks!
+    if (!poster) {
+        return <div className={classnames('meta-item', styles['netflix-card-wrapper'], className)} style={{ backgroundColor: '#141414' }} {...domProps} />;
+    }
+
+    const hoverModal = isHovered ? ReactDOM.createPortal(
         <div className={styles['hover-modal']} style={{ top: modalPos.top, left: modalPos.left }} onMouseLeave={handleMouseLeave}>
             <div className={styles['hover-video-container']} onClick={handlePlayNowClick} style={{cursor: 'pointer'}}>
                 {finalTrailerId ? (
@@ -252,12 +263,11 @@ const hoverModal = isHovered ? ReactDOM.createPortal(
         document.body
     ) : null;
 
-
     const baseShapeClass = `poster-shape-${posterShape || 'poster'}`;
     const wrapperClasses = classnames('meta-item', baseShapeClass, styles['netflix-card-wrapper'], className);
 
     return (
-        <a ref={cardRef} href={detailHref} className={wrapperClasses} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleCardClick} {...domProps}>
+        <a ref={cardRef} href={detailHref} className={wrapperClasses} onClick={handleCardClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} {...domProps}>
             <img src={poster} alt={name} className={styles['standard-poster']} loading="lazy" />
             
             {localWatched && !isContinueWatching && (
@@ -266,7 +276,6 @@ const hoverModal = isHovered ? ReactDOM.createPortal(
                 </div>
             )}
             
-            {/* The 'X' Button that ONLY renders in the Continue Watching row */}
             {isContinueWatching && (
                 <button className={styles['dismiss-btn']} onClick={handleDismiss} title="Remove from Continue Watching">
                     <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
