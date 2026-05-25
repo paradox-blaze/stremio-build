@@ -33,7 +33,7 @@ const MetaItem = (props) => {
     const detailHref = coreLink || (safeId ? `#/detail/${type || 'movie'}/${safeId}` : '#');
 
     // ==========================================
-    // 1. ALL HOOKS GO FIRST (Fixes the sorting error)
+    // 1. ALL HOOKS GO FIRST 
     // ==========================================
     
     const [localLibrary, setLocalLibrary] = React.useState(() => {
@@ -42,11 +42,20 @@ const MetaItem = (props) => {
         return payload.inLibrary === true || !!payload.state || !!payload._id;
     });
 
-    const [localWatched, setLocalWatched] = React.useState(() => {
-        const stored = localStorage.getItem(`stremio_watched_${safeId}`);
-        if (stored !== null) return stored === 'true';
-        return payload.watched || (payload.state && payload.state.isWatched) || (payload.state && payload.state.watched) || false;
-    });
+    // Derive watched state directly from props — localStorage is NOT used as source of truth.
+    // When the list re-sorts/re-filters, React reuses component instances at the same DOM position
+    // with entirely new props. If we seeded from localStorage[oldId], the stale "watched" badge
+    // would render on the wrong poster. The core already owns this state; trust it.
+    const watchedFromProps = payload.watched === true ||
+        (payload.state && (payload.state.isWatched === true || payload.state.watched === true)) ||
+        false;
+    const [localWatched, setLocalWatched] = React.useState(watchedFromProps);
+
+    // Re-sync whenever the underlying item swaps in (same component instance, different safeId)
+    React.useEffect(() => {
+        setLocalWatched(watchedFromProps);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [safeId]);
 
     const getGlobalMute = () => {
         if (!userHasInteracted) return true; 
@@ -87,7 +96,7 @@ const MetaItem = (props) => {
     }, [isHovered, safeId, type, extendedMeta]);
 
     // ==========================================
-    // 2. DATA PREP & SANITIZATION
+    // 2. DATA PREP & THE RUST PAYLOAD FIX
     // ==========================================
 
     const isContinueWatching = isCWRow === true;
@@ -95,14 +104,11 @@ const MetaItem = (props) => {
     const displayDesc = description || extendedMeta?.description || "Explore this title to see more details.";
     const displayBg = background || extendedMeta?.background || poster;
 
-    // THE SERIALIZATION CRASH FIX: Hardcast everything to primitive strings
-    const safePayload = {
-        id: String(safeId),
-        type: String(type || 'movie'),
-        name: String(name || ''),
-        poster: String(poster || ''),
-        background: String(displayBg || ''),
-        posterShape: String(posterShape || 'poster')
+    // THE MAGIC BULLET: We spread the original payload (keeping all hidden fields like behaviorHints) 
+    // but force the explicit 'id' property so the Rust deserializer never crashes!
+    const rustSafePayload = {
+        ...payload,
+        id: safeId
     };
 
     const calculatePosition = () => {
@@ -156,39 +162,40 @@ const MetaItem = (props) => {
                 action: 'Ctx', 
                 args: { 
                     action: newState ? 'AddToLibrary' : 'RemoveFromLibrary', 
-                    args: newState ? safePayload : String(safeId) 
+                    args: newState ? rustSafePayload : safeId 
                 } 
             });
         } catch (err) { console.error('Library sync failed:', err); }
     };
 
+    // THE NATIVE WATCHED ACTION — optimistic local update + dispatch to core.
+    // No localStorage write: the core is the single source of truth for watched state.
     const toggleWatched = (e) => {
         e.preventDefault(); e.stopPropagation();
         const newState = !localWatched;
-        setLocalWatched(newState); 
-        localStorage.setItem(`stremio_watched_${safeId}`, newState.toString());
+        setLocalWatched(newState); // optimistic UI update
         
         try {
             core.transport.dispatch({ 
                 action: 'Ctx', 
                 args: { 
                     action: 'MetaItemMarkAsWatched', 
-                    args: { meta_item: safePayload, is_watched: newState } 
+                    args: { meta_item: rustSafePayload, is_watched: newState } 
                 } 
             });
         } catch (err) { console.error('Watched sync failed:', err); }
     };
 
+    // THE REWIND FIX (Direct from your OG Code)
     const handleDismiss = (e) => {
         e.preventDefault(); e.stopPropagation();
         
         try {
-            // YOUR FIX: Resets playback progress, effectively dropping it from CW!
             core.transport.dispatch({
                 action: 'Ctx',
                 args: {
                     action: 'RewindLibraryItem', 
-                    args: String(safeId)
+                    args: safeId
                 }
             });
         } catch (err) { console.error('Dismiss failed:', err); }
@@ -210,7 +217,6 @@ const MetaItem = (props) => {
     // 4. RENDER UI
     // ==========================================
 
-    // EARLY RETURN SAFEGUARD: Must be below all hooks!
     if (!poster) {
         return <div className={classnames('meta-item', styles['netflix-card-wrapper'], className)} style={{ backgroundColor: '#141414' }} {...domProps} />;
     }
