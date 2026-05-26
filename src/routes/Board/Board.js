@@ -267,16 +267,18 @@ const Board = () => {
                     }
                     {board.catalogs.map((catalog, index) => {
                         switch (catalog.content?.type) {
-                            case 'Ready': {
-                                return (
-                                    <MetaRow
-                                        key={index}
-                                        className={classnames(styles['board-row'], styles[`board-row-${catalog.content.content[0].posterShape}`], 'animation-fade-in')}
-                                        catalog={catalog}
-                                        itemComponent={MetaItem}
-                                    />
-                                );
-                            }
+                        case 'Ready': {
+                            return (
+                                <MetaRow
+                                    key={index}
+                                    // FIX: Added optional chaining and a fallback to 'poster' so empty catalogs don't crash
+                                    className={classnames(styles['board-row'], styles[`board-row-${catalog.content.content[0]?.posterShape || 'poster'}`], 'animation-fade-in')}
+                                    catalog={catalog}
+                                    itemComponent={MetaItem}
+                                />
+                            );
+                        }
+
                             case 'Err': {
                                 if (catalog.content.content !== 'EmptyContent') {
                                     return (
