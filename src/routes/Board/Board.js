@@ -57,7 +57,11 @@ const HeroBanner = ({ catalogs }) => {
         let cinemetaPool = [];
 
         catalogs.forEach(cat => {
-            const catItems = cat?.content?.content || cat?.items || [];
+            // FIX: Grab the raw content, but strictly enforce that it must be an Array.
+            // If Stremio passes a string like 'EmptyContent' due to an error, we default to an empty array [].
+            let rawItems = cat?.content?.content || cat?.items;
+            const catItems = Array.isArray(rawItems) ? rawItems : [];
+
             // RELAXED FILTER: We no longer require a background or description! Just a poster.
             const validItems = catItems.filter(i => i.poster && (i.type === 'movie' || i.type === 'series'));
             const isCinemeta = cat.id?.includes('cinemeta') || cat.addon?.manifest?.id?.includes('cinemeta');
@@ -68,6 +72,7 @@ const HeroBanner = ({ catalogs }) => {
 
         const shuffledCustom = customAddonPool.sort(() => 0.5 - Math.random());
         const shuffledCinemeta = cinemetaPool.sort(() => 0.5 - Math.random());
+        
         // Put custom addons (Watchly) at the front of the line!
         let mixedPool = [...shuffledCustom, ...shuffledCinemeta];
         
@@ -78,7 +83,7 @@ const HeroBanner = ({ catalogs }) => {
         } else if (uniqueItems.length > 0) {
             setHeroItems(uniqueItems); 
         }
-    }, [catalogs]); 
+    }, [catalogs]);
 
     React.useEffect(() => {
         if (heroItems.length <= 1 || isHovered) return; 
