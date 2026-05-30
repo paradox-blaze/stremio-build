@@ -64,13 +64,39 @@
         opacity: 0.6;
     }
 
+
     .meta-items-container {
         display: flex;
         flex-direction: row;
         align-items: stretch;
-        overflow: visible;
+        padding: 15px 10px; /* 15px top/bottom, 10px left/right */
+        margin: -15px -10px;
+
+        /* --- ADD THESE LINES --- */
+        padding-top: 15px;
+        padding-bottom: 15px;
+        /* Optional: Negative margins pull the container back so your row spacing doesn't visually change */
+        margin-top: -15px;   
+        margin-bottom: -15px;
+        /* ----------------------- */
+
+        // Native horizontal scroll — same behaviour Stremio already uses on mobile,
+        // now applied at all screen sizes. Hide the scrollbar visually.
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        scrollbar-width: none;
+
 
         .meta-item {
+            // Each item snaps cleanly to the left edge when scrolling
+            scroll-snap-align: start;
+            flex-shrink: 0;
+
             &.poster-shape-poster {
                 flex: calc(1 / var(--poster-shape-ratio));
             }
@@ -110,12 +136,12 @@
 
 /* Force posters to be large and prevent them from squishing */
 .meta-item {
-    flex: 0 0 auto !important; 
-    
+    flex: 0 0 auto !important;
+
     /* Netflix banner size - adjust these if they are too big/small */
-    width: 220px !important;   
-    height: 330px !important;  
-    
+    width: 220px !important;
+    height: 330px !important;
+
     /* Hover effect */
     transition: transform 0.2s ease-in-out !important;
 }
@@ -124,4 +150,3 @@
     transform: scale(1.05) !important;
     z-index: 10;
 }
-

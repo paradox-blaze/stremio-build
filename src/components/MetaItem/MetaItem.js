@@ -35,7 +35,14 @@ const MetaItem = (props) => {
     // ==========================================
     // 1. ALL HOOKS GO FIRST 
     // ==========================================
-    
+ const [isDismissed, setIsDismissed] = React.useState(false);
+
+    // If React recycles this component for a different movie during a shift, 
+    // this ensures the new movie doesn't inherit the "dismissed" invisible state.
+    React.useEffect(() => {
+        setIsDismissed(false);
+    }, [safeId]);   
+
     const [localLibrary, setLocalLibrary] = React.useState(() => {
         const stored = localStorage.getItem(`stremio_lib_${safeId}`);
         if (stored !== null) return stored === 'true';
@@ -223,8 +230,10 @@ const MetaItem = (props) => {
         } catch (err) { console.error('Watched sync failed:', err); }
     };
 
-    const handleDismiss = (e) => {
+const handleDismiss = (e) => {
         e.preventDefault(); e.stopPropagation();
+        
+        setIsDismissed(true); // Let React's Virtual DOM hide it safely
         
         try {
             core.transport.dispatch({
@@ -235,8 +244,6 @@ const MetaItem = (props) => {
                 }
             });
         } catch (err) { console.error('Dismiss failed:', err); }
-
-        if (cardRef.current) cardRef.current.style.display = 'none';
     };
 
     const handlePlayNowClick = (e) => {
@@ -315,7 +322,7 @@ const MetaItem = (props) => {
     const wrapperClasses = classnames('meta-item', baseShapeClass, styles['netflix-card-wrapper'], className);
 
     return (
-        <a ref={cardRef} href={detailHref} className={wrapperClasses} onClick={handleCardClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} {...domProps}>
+        <a ref={cardRef} href={detailHref} style={{ display: isDismissed ? 'none' : '' }} className={wrapperClasses} onClick={handleCardClick} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} {...domProps}>
             <img src={poster} alt={name} className={styles['standard-poster']} loading="lazy" />
             
             {localWatched && !isContinueWatching && (

@@ -384,18 +384,23 @@
 
 
 
+/* =========================================
+   NETFLIX CARD WRAPPER
+   ========================================= */
 .netflix-card-wrapper {
-    /* REMOVED: width, height, flex-shrink, and margins. Let Stremio's grid handle it! */
     position: relative;
     display: block;
     margin-right: 10px;
     cursor: pointer;
-    overflow: visible !important; 
+    overflow: visible !important;
     
-    /* Force our container to perfectly fill Stremio's native grid slots */
-    width: 100%;
+    /* THE NETFLIX PEEK FIX:
+       Forces exactly 5.5 items to fit in the row. 
+       This leaves a fraction of an item hanging off the left and right edges! */
+    flex: 0 0 calc(100% / 5.5) !important;
     height: 100%;
 }
+
 .netflix-card-wrapper:hover {
     z-index: 999 !important;
 }
@@ -868,3 +873,138 @@
 .netflix-card-wrapper:hover .dismiss-btn {
     opacity: 1;
 }
+
+
+/* =========================================
+   GLOBAL DROPDOWN & MENU FROSTING
+   (Fixes all transparent Stremio dropdowns)
+   ========================================= */
+div[role="listbox"],
+div[class*="dropdown-"] {
+    background-color: rgba(20, 20, 20, 0.75) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9) !important;
+    border-radius: 8px !important;
+    padding: 4px !important;
+}
+
+div[role="listbox"] > div[tabindex="0"] {
+    transition: background-color 0.2s ease, transform 0.1s ease !important;
+    border-radius: 4px !important;
+    margin: 2px 0 !important;
+}
+
+div[role="listbox"] > div[tabindex="0"]:hover,
+div[role="listbox"] > div[aria-selected="true"] {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* =========================================
+   VIDEO TEXT READABILITY FIX (Hero Banner)
+   ========================================= */
+.netflix-hero-vignette {
+    position: relative;
+    z-index: 2; 
+    /* Deepens the black gradient so white text stands out over bright videos */
+    background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.85) 35%, rgba(0,0,0,0.3) 70%, transparent 100%), 
+                linear-gradient(to top, rgba(20,20,20,1) 0%, rgba(20,20,20,0) 40%) !important;
+}
+
+.netflix-hero-content h1 {
+    /* Adds a harsh drop-shadow to the title */
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,1) !important;
+}
+
+.netflix-hero-description {
+    /* Adds a drop-shadow to the description paragraph */
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,1) !important;
+    font-weight: 500 !important; /* Slightly thickens the text for readability */
+}
+
+/* =========================================
+   CONTEXT MENU FROSTING (Right-Click Streams)
+   ========================================= */
+div[class*="context-menu-content"] {
+    background-color: rgba(20, 20, 20, 0.85) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9) !important;
+    border-radius: 8px !important;
+    padding: 6px !important;
+}
+
+/* Make the title (stream info) crisp and separated */
+div[class*="context-menu-title"] {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 4px rgba(0,0,0,1) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 4px !important;
+    font-weight: 500 !important;
+}
+
+/* Base style for the clickable options */
+div[class*="context-menu-option-container"] {
+    transition: background-color 0.2s ease !important;
+    border-radius: 4px !important;
+    margin: 2px 0 !important;
+    padding: 8px !important;
+    color: #ffffff !important;
+}
+
+/* Hover highlight for the options */
+div[class*="context-menu-option-container"]:hover,
+div[class*="context-menu-option-container"]:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    outline: none !important;
+}
+
+/* Ensure text labels and SVG icons stay bright white */
+div[class*="context-menu-option-label"],
+div[class*="context-menu-option-container"] svg {
+    color: #ffffff !important;
+}
+
+
+/* =========================================
+   VIDEO PLAYER OPTIONS MENU (Subtitles, Audio, etc.)
+   ========================================= */
+div[class*="options-menu-container"],
+div[class*="menu-layer"] {
+    background-color: rgba(20, 20, 20, 0.85) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9) !important;
+    border-radius: 8px !important;
+}
+
+/* Base style for Subtitle/Audio items */
+div[class*="options-menu-container"] div[class*="option-container-"] {
+    transition: background-color 0.2s ease !important;
+    border-radius: 4px !important;
+    color: #ffffff !important;
+    margin: 2px 4px !important;
+}
+
+/* Hover & Selected states for the options */
+div[class*="options-menu-container"] div[class*="option-container-"]:hover,
+div[class*="options-menu-container"] div[class*="option-container-"]:focus,
+div[class*="options-menu-container"] div[aria-selected="true"] {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    outline: none !important;
+}
+
+/* Force text and icons to be bright white */
+div[class*="options-menu-container"] div[class*="label-"],
+div[class*="options-menu-container"] svg {
+    color: #ffffff !important;
+}
+
+
+
+
+

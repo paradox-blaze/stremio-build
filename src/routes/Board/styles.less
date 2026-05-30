@@ -43,149 +43,17 @@
     }
 }
 
-@media only screen and (max-width: @large) {
-    .board-container {
-        .board-content-container {
-            .board-content {
-                .board-row-poster, .board-row-square, .continue-watching-row {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+10) {
-                            display: none;
-                        }
-                    }
-                }
 
-                .board-row-landscape {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+9) {
-                            display: none;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
-@media only screen and (max-width: @normal) {
-    .board-container {
-        .board-content-container {
-            .board-content {
-                .board-row-poster, .board-row-square, .continue-watching-row {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+9) {
-                            display: none;
-                        }
-                    }
-                }
 
-                .board-row-landscape {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+8) {
-                            display: none;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
-@media only screen and (max-width: @medium) {
-    .board-container {
-        .board-content-container {
-            .board-content {
-                .board-row-poster, .board-row-square, .continue-watching-row {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+8) {
-                            display: none;
-                        }
-                    }
-                }
 
-                .board-row-landscape {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+7) {
-                            display: none;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
-@media only screen and (max-width: @small) {
-    .board-container {
-        .board-content-container {
-            .board-content {
-                .board-row-poster, .board-row-square, .continue-watching-row {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+7) {
-                            display: none;
-                        }
-                    }
-                }
 
-                .board-row-landscape {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+6) {
-                            display: none;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
-@media only screen and (max-width: @xsmall) {
-    .board-container {
-        .board-content-container {
-            .board-content {
-                .board-row-poster, .board-row-square, .continue-watching-row {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+6) {
-                            display: none;
-                        }
-                    }
-                }
 
-                .board-row-landscape {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+5) {
-                            display: none;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
-@media only screen and (max-width: @xxsmall) {
-    .board-container {
-        .board-content-container {
-            .board-content {
-                .board-row-poster, .board-row-square, .continue-watching-row {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+5) {
-                            display: none;
-                        }
-                    }
-                }
 
-                .board-row-landscape {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+4) {
-                            display: none;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 
 @media only screen and (max-width: @minimum) {
     .board-container {
@@ -196,22 +64,6 @@
             .board-content {
                 .board-row {
                     margin-bottom: 1.5rem;
-                }
-
-                .board-row-poster, .board-row-square, .continue-watching-row {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+4) {
-                            display: none;
-                        }
-                    }
-                }
-
-                .board-row-landscape {
-                    .meta-item, .meta-item-placeholder {
-                        &:nth-child(n+3) {
-                            display: none;
-                        }
-                    }
                 }
             }
         }
@@ -592,4 +444,93 @@
 .hero-mute-btn svg {
     width: 22px;
     height: 22px;
+}
+
+
+
+/* =========================================
+   NETFLIX ROW SCROLLING & ARROWS
+   ========================================= */
+.netflix-row-wrapper {
+    position: relative;
+    display: block;
+}
+
+/* 1. Hijack Stremio's native horizontal scrolling container to enforce snapping */
+.netflix-row-wrapper div[class*="items-container"] {
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar IE and Edge */
+    scroll-behavior: smooth;
+    padding-bottom: 20px; /* Gives room for scaled hover cards */
+}
+
+/* 2. Hide the ugly default scrollbar in Chrome/Safari */
+.netflix-row-wrapper div[class*="items-container"]::-webkit-scrollbar {
+    display: none; 
+}
+
+/* 3. Snap alignment: Every child item locks to the start of the grid */
+.netflix-row-wrapper div[class*="items-container"] > * {
+    scroll-snap-align: start;
+}
+
+/* 4. The Hover Arrows */
+.row-arrow {
+    position: absolute;
+    top: 3.5rem; /* Push perfectly below the title text */
+    bottom: 1.5rem; /* Stop just before the bottom padding */
+    width: 50px; /* Nice, thick hover area */
+    background-color: rgba(20, 20, 20, 0.6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 50;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Only show arrows when hovering over the specific row */
+.netflix-row-wrapper:hover .row-arrow:not(.hidden) {
+    opacity: 1;
+}
+
+.row-arrow:hover {
+    background-color: rgba(20, 20, 20, 0.9);
+}
+
+.row-arrow:active {
+    transform: scale(0.95);
+}
+
+/* Hides the left arrow if we are at the beginning, right if at the end */
+.row-arrow.hidden {
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* Position and Shadowing */
+.row-arrow-left {
+    left: 0;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    box-shadow: 10px 0 20px rgba(0,0,0,0.5);
+}
+
+.row-arrow-right {
+    right: 0;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    box-shadow: -10px 0 20px rgba(0,0,0,0.5);
+}
+
+/* Thicken the SVG chevron */
+.row-arrow svg {
+    width: 36px;
+    height: 36px;
+    filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
 }
