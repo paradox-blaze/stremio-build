@@ -146,10 +146,10 @@ const HeroBanner = ({ catalogs }) => {
                     <div key={item.id} className={classnames(styles['netflix-hero-slide'], { [styles['active']]: isActive })} style={{ backgroundImage: `url(${displayBg})` }}>
                         {isActive && isPlaying && finalTrailerId && (
                             <div className={styles['hero-video-wrapper']}>
-                                <iframe ref={iframeRef} src={`https://www.youtube.com/embed/${finalTrailerId}?autoplay=1&controls=0&mute=${initialMuteRef.current ? 1 : 0}&modestbranding=1&loop=1&playlist=${finalTrailerId}&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3&rel=0&playsinline=1`} allow="autoplay" frameBorder="0" className={styles['hero-video-iframe']} />
+                                <iframe ref={iframeRef} src={`https://www.youtube.com/embed/${finalTrailerId}?autoplay=1&controls=0&mute=${initialMuteRef.current ? 1 : 0}&modestbranding=1&loop=1&playlist=${finalTrailerId}&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3&rel=0&playsinline=1&vq=hd1080`} allow="autoplay" frameBorder="0" className={styles['hero-video-iframe']} />
                             </div>
                         )}
-                        <div className={styles['netflix-hero-vignette']}>
+                    <div className={classnames(styles['netflix-hero-vignette'], { [styles['is-playing']]: isActive && isPlaying && finalTrailerId })}>
                             <div className={styles['netflix-hero-content']}>
                                 {item.logo ? <img src={item.logo} alt={item.name} className={styles['netflix-hero-logo']} /> : <h1>{item.name}</h1>}
                                 <div className={styles['netflix-hero-action-row']}>

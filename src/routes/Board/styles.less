@@ -534,3 +534,58 @@
     height: 36px;
     filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
 }
+
+
+/* =========================================
+   VIDEO TEXT READABILITY FIX (Hero Banner)
+   ========================================= */
+/* =========================================
+   VIDEO TEXT READABILITY FIX (Hero Banner)
+   ========================================= */
+.netflix-hero-vignette {
+    position: relative;
+    z-index: 2; 
+    
+    /* Keep the main wrapper transparent */
+    background: transparent !important; 
+
+    /* 1. DEFAULT STATE: Use a pseudo-element layer for the gradient */
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1; /* Puts the shadow strictly behind the text */
+        pointer-events: none;
+        
+        /* Compressed gradient: Starts dark, but completely transparent by 35% across the screen */
+        background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 15%, transparent 35%), 
+                    linear-gradient(to top, rgba(20,20,20,1) 0%, rgba(20,20,20,0) 25%);
+        
+        opacity: 1;
+        /* A longer 0.8s ease-out gives it that smooth, gentle cinematic fade */
+        transition: opacity 0.8s ease-out;
+    }
+
+    /* 2. PLAYING STATE: Smoothly drop the opacity to 0 when the video plays */
+    &.is-playing::before {
+        opacity: 0;
+    }
+}
+
+.hero-video-iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    
+    /* Make the iframe physically massive to push all YouTube UI out of bounds */
+    width: 120%; 
+    height: 300%; 
+    
+    /* Center it perfectly inside the wrapper */
+    transform: translate(-50%, -50%); 
+    
+    pointer-events: none;
+}
