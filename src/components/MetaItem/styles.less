@@ -969,46 +969,13 @@ div[class*="context-menu-option-container"] svg {
 }
 
 
-/* =========================================
-   VIDEO PLAYER OPTIONS MENU (Subtitles, Audio, etc.)
-   ========================================= */
-div[class*="options-menu-container"],
-div[class*="menu-layer"] {
-    background-color: rgba(20, 20, 20, 0.85) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9) !important;
-    border-radius: 8px !important;
-}
-
-/* Base style for Subtitle/Audio items */
-div[class*="options-menu-container"] div[class*="option-container-"] {
-    transition: background-color 0.2s ease !important;
-    border-radius: 4px !important;
-    color: #ffffff !important;
-    margin: 2px 4px !important;
-}
-
-/* Hover & Selected states for the options */
-div[class*="options-menu-container"] div[class*="option-container-"]:hover,
-div[class*="options-menu-container"] div[class*="option-container-"]:focus,
-div[class*="options-menu-container"] div[aria-selected="true"] {
-    background-color: rgba(255, 255, 255, 0.15) !important;
-    outline: none !important;
-}
-
-/* Force text and icons to be bright white */
-div[class*="options-menu-container"] div[class*="label-"],
-div[class*="options-menu-container"] svg {
-    color: #ffffff !important;
-}
-
 
 /* =========================================
    SEARCH BAR DROPDOWN FROSTING
    ========================================= */
-div[class*="menu-container-"] {
+/* We added :not([class*="control-bar"]) to prevent friendly-fire on the video player UI! */
+
+div[class*="menu-container-"]:not([class*="control-bar"]) {
     background-color: rgba(20, 20, 20, 0.85) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
@@ -1018,27 +985,24 @@ div[class*="menu-container-"] {
     padding: 6px !important;
 }
 
-/* Format the Search History title header */
-div[class*="menu-container-"] div[class*="title-"] {
+div[class*="menu-container-"]:not([class*="control-bar"]) div[class*="title-"] {
     color: rgba(255, 255, 255, 0.8) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     padding: 4px 8px 8px 8px !important;
     margin-bottom: 4px !important;
 }
 
-/* Ensure the 'Clear history' button pops (Netflix Red) */
-div[class*="menu-container-"] button[class*="search-history-clear-"] {
+div[class*="menu-container-"]:not([class*="control-bar"]) button[class*="search-history-clear-"] {
     color: #e50914 !important;
     font-weight: bold !important;
     transition: color 0.2s ease !important;
 }
 
-div[class*="menu-container-"] button[class*="search-history-clear-"]:hover {
+div[class*="menu-container-"]:not([class*="control-bar"]) button[class*="search-history-clear-"]:hover {
     color: #ff0f1a !important;
 }
 
-/* Base style for the clickable search history items */
-div[class*="menu-container-"] a[class*="item-"] {
+div[class*="menu-container-"]:not([class*="control-bar"]) a[class*="item-"] {
     transition: background-color 0.2s ease !important;
     border-radius: 4px !important;
     margin: 2px 0 !important;
@@ -1047,14 +1011,8 @@ div[class*="menu-container-"] a[class*="item-"] {
     display: block !important;
 }
 
-/* Hover highlight for the search history items */
-div[class*="menu-container-"] a[class*="item-"]:hover,
-div[class*="menu-container-"] a[class*="item-"]:focus {
+div[class*="menu-container-"]:not([class*="control-bar"]) a[class*="item-"]:hover,
+div[class*="menu-container-"]:not([class*="control-bar"]) a[class*="item-"]:focus {
     background-color: rgba(255, 255, 255, 0.15) !important;
     outline: none !important;
 }
-
-
-
-
-
