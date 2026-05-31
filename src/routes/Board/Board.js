@@ -45,27 +45,44 @@ const HeroBanner = ({ catalogs }) => {
     const playTimer = React.useRef(null);
     const iframeRef = React.useRef(null);
 
-    React.useEffect(() => {
+React.useEffect(() => {
+        // Stop shuffling and lock the movies in place once we have 5 of them!
         if (!catalogs || catalogs.length === 0 || heroItems.length >= 5) return;
-        let customAddonPool = [];
+        
+        let watchlyPool = [];
         let cinemetaPool = [];
 
         catalogs.forEach(cat => {
             let rawItems = cat?.content?.content || cat?.items;
             const catItems = Array.isArray(rawItems) ? rawItems : [];
 
+            // Only grab valid movies/series with a poster
             const validItems = catItems.filter(i => i.poster && (i.type === 'movie' || i.type === 'series'));
-            const isCinemeta = cat.id?.includes('cinemeta') || cat.addon?.manifest?.id?.includes('cinemeta');
             
-            if (isCinemeta) cinemetaPool = [...cinemetaPool, ...validItems];
-            else customAddonPool = [...customAddonPool, ...validItems];
+            // Safely check the addon ID and Name (converted to lowercase just in case)
+            const addonId = (cat.id || cat.addon?.manifest?.id || '').toLowerCase();
+            const addonName = (cat.addon?.manifest?.name || '').toLowerCase();
+
+            const isWatchly = addonId.includes('watchly') || addonName.includes('watchly');
+            const isCinemeta = addonId.includes('cinemeta') || addonName.includes('cinemeta');
+            
+            if (isWatchly) {
+                watchlyPool = [...watchlyPool, ...validItems];
+            } else if (isCinemeta) {
+                cinemetaPool = [...cinemetaPool, ...validItems];
+            }
+            // ALL OTHER COMMUNITY ADDONS ARE NOW COMPLETELY IGNORED
         });
 
-        const shuffledCustom = customAddonPool.sort(() => 0.5 - Math.random());
+        // Shuffle both pools separately to keep the banner feeling fresh
+        const shuffledWatchly = watchlyPool.sort(() => 0.5 - Math.random());
         const shuffledCinemeta = cinemetaPool.sort(() => 0.5 - Math.random());
-        let mixedPool = [...shuffledCustom, ...shuffledCinemeta];
         
-        const uniqueItems = Array.from(new Map(mixedPool.map(item => [item.id, item])).values());
+        // Watchly takes strict precedence. Cinemeta fills in the gaps if Watchly doesn't have 5 items.
+        let prioritizedPool = [...shuffledWatchly, ...shuffledCinemeta];
+        
+        // Filter out duplicates (keeps the Watchly version since it comes first in the array)
+        const uniqueItems = Array.from(new Map(prioritizedPool.map(item => [item.id, item])).values());
 
         if (uniqueItems.length >= 5) {
             setHeroItems(uniqueItems.slice(0, 5));
