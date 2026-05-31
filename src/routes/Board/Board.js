@@ -46,7 +46,7 @@ const HeroBanner = ({ catalogs }) => {
     const iframeRef = React.useRef(null);
 
     React.useEffect(() => {
-        if (!catalogs || catalogs.length === 0) return;
+        if (!catalogs || catalogs.length === 0 || heroItems.length >= 5) return;
         let customAddonPool = [];
         let cinemetaPool = [];
 
