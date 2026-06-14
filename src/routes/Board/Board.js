@@ -45,8 +45,7 @@ const HeroBanner = ({ catalogs }) => {
     const playTimer = React.useRef(null);
     const iframeRef = React.useRef(null);
 
-React.useEffect(() => {
-        // Stop shuffling and lock the movies in place once we have 5 of them!
+    React.useEffect(() => {
         if (!catalogs || catalogs.length === 0 || heroItems.length >= 5) return;
         
         let watchlyPool = [];
@@ -56,10 +55,8 @@ React.useEffect(() => {
             let rawItems = cat?.content?.content || cat?.items;
             const catItems = Array.isArray(rawItems) ? rawItems : [];
 
-            // Only grab valid movies/series with a poster
             const validItems = catItems.filter(i => i.poster && (i.type === 'movie' || i.type === 'series'));
             
-            // Safely check the addon ID and Name (converted to lowercase just in case)
             const addonId = (cat.id || cat.addon?.manifest?.id || '').toLowerCase();
             const addonName = (cat.addon?.manifest?.name || '').toLowerCase();
 
@@ -71,17 +68,13 @@ React.useEffect(() => {
             } else if (isCinemeta) {
                 cinemetaPool = [...cinemetaPool, ...validItems];
             }
-            // ALL OTHER COMMUNITY ADDONS ARE NOW COMPLETELY IGNORED
         });
 
-        // Shuffle both pools separately to keep the banner feeling fresh
         const shuffledWatchly = watchlyPool.sort(() => 0.5 - Math.random());
         const shuffledCinemeta = cinemetaPool.sort(() => 0.5 - Math.random());
         
-        // Watchly takes strict precedence. Cinemeta fills in the gaps if Watchly doesn't have 5 items.
         let prioritizedPool = [...shuffledWatchly, ...shuffledCinemeta];
         
-        // Filter out duplicates (keeps the Watchly version since it comes first in the array)
         const uniqueItems = Array.from(new Map(prioritizedPool.map(item => [item.id, item])).values());
 
         if (uniqueItems.length >= 5) {
@@ -106,16 +99,22 @@ React.useEffect(() => {
     React.useEffect(() => {
         if (isPlaying && !initialTrailerId && activeItem?.id) {
             let metaUrl = '';
-            if (activeItem.id.startsWith('tt')) metaUrl = `https://v3-cinemeta.strem.io/meta/${activeItem.type}/${activeItem.id}.json`;
-            else if (activeItem.id.startsWith('tmdb:') || !isNaN(activeItem.id)) {
-                const tmdbId = activeItem.id.startsWith('tmdb:') ? activeItem.id : `tmdb:${activeItem.id}`;
-                metaUrl = `https://tmdb.strem.fun/meta/${activeItem.type}/${tmdbId}.json`;
+            const rawId = String(activeItem.id);
+            
+            if (rawId.includes('tt')) {
+                const match = rawId.match(/(tt\d+)/);
+                if (match) metaUrl = `https://v3-cinemeta.strem.io/meta/${activeItem.type}/${match[1]}.json`;
+            } else {
+                const match = rawId.match(/(\d+)/);
+                if (match) metaUrl = `https://tmdb.strem.fun/meta/${activeItem.type}/tmdb:${match[1]}.json`;
             }
 
             if (metaUrl) {
                 fetch(metaUrl).then(res => res.json()).then(data => {
                     const fetchedTrailers = data?.meta?.trailers || data?.meta?.trailerStreams || [];
-                    if (fetchedTrailers.length > 0) setDynamicTrailer(fetchedTrailers[0].ytId || fetchedTrailers[0].source);
+                    if (fetchedTrailers.length > 0) {
+                        setDynamicTrailer(fetchedTrailers[0].ytId || fetchedTrailers[0].source);
+                    }
                 }).catch(console.error);
             }
         }
@@ -150,6 +149,13 @@ React.useEffect(() => {
         }
     };
 
+    // THE FIX: Unmute the video automatically after it bypasses the browser's autoplay block
+    const handleIframeLoad = () => {
+        if (!initialMuteRef.current && iframeRef.current && iframeRef.current.contentWindow) {
+            iframeRef.current.contentWindow.postMessage(JSON.stringify({ "event": "command", "func": "unMute", "args": [] }), "*");
+        }
+    };
+
     if (heroItems.length === 0) return null;
 
     return (
@@ -163,10 +169,19 @@ React.useEffect(() => {
                     <div key={item.id} className={classnames(styles['netflix-hero-slide'], { [styles['active']]: isActive })} style={{ backgroundImage: `url(${displayBg})` }}>
                         {isActive && isPlaying && finalTrailerId && (
                             <div className={styles['hero-video-wrapper']}>
-                                <iframe ref={iframeRef} src={`https://www.youtube.com/embed/${finalTrailerId}?autoplay=1&controls=0&mute=${initialMuteRef.current ? 1 : 0}&modestbranding=1&loop=1&playlist=${finalTrailerId}&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3&rel=0&playsinline=1&vq=hd1080`} allow="autoplay" frameBorder="0" className={styles['hero-video-iframe']} />
+                                {/* THE FIX: mute=1 is now hardcoded into the URL to guarantee autoplay */}
+                                <iframe 
+                                    ref={iframeRef} 
+                                    onLoad={handleIframeLoad}
+                                    src={`https://www.youtube.com/embed/${finalTrailerId}?autoplay=1&controls=0&mute=1&modestbranding=1&loop=1&playlist=${finalTrailerId}&enablejsapi=1&disablekb=1&fs=0&iv_load_policy=3&rel=0&playsinline=1&vq=hd1080`} 
+                                    allow="autoplay" 
+                                    frameBorder="0" 
+                                    className={styles['hero-video-iframe']} 
+                                />
                             </div>
                         )}
-                    <div className={classnames(styles['netflix-hero-vignette'], { [styles['is-playing']]: isActive && isPlaying && finalTrailerId })}>
+                        
+                        <div className={classnames(styles['netflix-hero-vignette'], { [styles['is-playing']]: isActive && isPlaying && finalTrailerId })}>
                             <div className={styles['netflix-hero-content']}>
                                 {item.logo ? <img src={item.logo} alt={item.name} className={styles['netflix-hero-logo']} /> : <h1>{item.name}</h1>}
                                 <div className={styles['netflix-hero-action-row']}>
